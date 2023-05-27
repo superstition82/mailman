@@ -1,4 +1,4 @@
-package core
+package server
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 
 	_db "probemail/db"
-	"probemail/util"
+	_config "probemail/server/config"
 )
 
 // Server serves HTTP requests for our banking service.
@@ -19,16 +19,19 @@ type Server struct {
 	e  *echo.Echo
 	db *sql.DB
 
-	Config *util.Config
+	Config *_config.Config
 	Store  *_db.Store
 }
 
-// NewServer creates a new HTTP server and set up routing.
-func NewServer(ctx context.Context, config *util.Config) (*Server, error) {
+// New creates a new HTTP server and set up routing.
+func New(ctx context.Context, config *_config.Config) (*Server, error) {
 	e := echo.New()
 	e.Debug = true
 	e.HideBanner = true
-	e.HidePort = true
+
+	e.Use(middleware.Gzip())
+	e.Use(middleware.CORS())
+	e.Use(middleware.Recover())
 
 	db := _db.NewDB(config)
 	if err := db.Open(ctx); err != nil {
@@ -40,29 +43,17 @@ func NewServer(ctx context.Context, config *util.Config) (*Server, error) {
 		db:     db.DBInstance,
 		Config: config,
 	}
+
 	storeInstance := _db.NewStore(db.DBInstance, config)
 	s.Store = storeInstance
 
-	e.Use(middleware.Gzip())
+	// default ui
+	embedFrontend(e)
 
-	e.Use(middleware.CORS())
-
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: `{"time":"${time_rfc3339}",` +
-			`"method":"${method}","uri":"${uri}",` +
-			`"status":${status},"error":"${error}"}` + "\n",
-	}))
-
-	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
-		ErrorMessage: "Request timeout",
-		Timeout:      30 * time.Second,
-	}))
-
-	rootGroup := e.Group("")
-	s.registerRootRoutes(rootGroup)
-
-	emailVerifyGroup := e.Group("/verify")
-	s.registerEmailVerifyRoutes(emailVerifyGroup)
+	// default routes
+	apiGroup := e.Group("/api")
+	s.registerHelloRoutes(apiGroup)
+	s.registerEmailVerifyRoutes(apiGroup)
 
 	return s, nil
 }

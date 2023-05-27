@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"os"
 
-	_ "github.com/mattn/go-sqlite3"
+	_config "probemail/server/config"
 
-	"probemail/util"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 //go:embed migration
@@ -18,10 +18,10 @@ var migrationFS embed.FS
 
 type DB struct {
 	DBInstance *sql.DB
-	config     *util.Config
+	config     *_config.Config
 }
 
-func NewDB(config *util.Config) *DB {
+func NewDB(config *_config.Config) *DB {
 	db := &DB{
 		config: config,
 	}

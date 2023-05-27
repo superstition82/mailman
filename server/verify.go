@@ -1,4 +1,4 @@
-package core
+package server
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ var (
 )
 
 func (server *Server) registerEmailVerifyRoutes(g *echo.Group) {
-	g.POST("", func(c echo.Context) error {
+	g.POST("/verify/", func(c echo.Context) error {
 		email := c.QueryParam("email")
 		if email == "" {
 			return echo.NewHTTPError(http.StatusBadRequest, "email is required")

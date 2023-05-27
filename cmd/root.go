@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"probemail/core"
-	"probemail/util"
+	"probemail/server"
+	_config "probemail/server/config"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	config *util.Config
+	config *_config.Config
 	mode   string
 	port   int
 	data   string
@@ -37,7 +37,7 @@ var (
 		Short: "An self-hosted email manager",
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithCancel(context.Background())
-			s, err := core.NewServer(ctx, config)
+			s, err := server.New(ctx, config)
 			if err != nil {
 				cancel()
 				fmt.Printf("Failed to create server, error: %+v\n", err)
@@ -109,7 +109,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 	var err error
 
-	config, err = util.GetConfig()
+	config, err = _config.GetConfig()
 	if err != nil {
 		fmt.Printf("failed to get config, error: %+v\n", err)
 		return

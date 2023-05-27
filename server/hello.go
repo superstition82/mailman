@@ -1,4 +1,4 @@
-package core
+package server
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (server *Server) registerRootRoutes(g *echo.Group) {
+func (server *Server) registerHelloRoutes(g *echo.Group) {
 	g.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World! 🖖")
 	})
