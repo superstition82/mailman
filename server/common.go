@@ -2,7 +2,7 @@ package server
 
 import (
 	"net/http"
-	"probemail/common"
+	"probemail/util"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,5 +23,5 @@ func defaultGetRequestSkipper(c echo.Context) bool {
 
 func defaultAPIRequestSkipper(c echo.Context) bool {
 	path := c.Path()
-	return common.HasPrefixes(path, "/api")
+	return util.HasPrefixes(path, "/api")
 }

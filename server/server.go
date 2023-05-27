@@ -2,29 +2,28 @@ package server
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"time"
 
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 
-	_db "probemail/db"
-	_config "probemail/server/config"
+	"probemail/db"
+	"probemail/server/config"
 )
 
 // Server serves HTTP requests for our banking service.
 type Server struct {
 	e  *echo.Echo
-	db *sql.DB
+	db *gorm.DB
 
-	Config *_config.Config
-	Store  *_db.Store
+	Config *config.Config
 }
 
 // New creates a new HTTP server and set up routing.
-func New(ctx context.Context, config *_config.Config) (*Server, error) {
+func New(ctx context.Context, config *config.Config) (*Server, error) {
 	e := echo.New()
 	e.Debug = true
 	e.HideBanner = true
@@ -33,7 +32,7 @@ func New(ctx context.Context, config *_config.Config) (*Server, error) {
 	e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
 
-	db := _db.NewDB(config)
+	db := db.NewDB(config)
 	if err := db.Open(ctx); err != nil {
 		return nil, errors.Wrap(err, "cannot open db")
 	}
@@ -44,15 +43,12 @@ func New(ctx context.Context, config *_config.Config) (*Server, error) {
 		Config: config,
 	}
 
-	storeInstance := _db.NewStore(db.DBInstance, config)
-	s.Store = storeInstance
-
 	// default ui
 	embedFrontend(e)
 
 	// default routes
 	apiGroup := e.Group("/api")
-	s.registerHelloRoutes(apiGroup)
+	s.registerClientRoutes(apiGroup)
 	s.registerEmailVerifyRoutes(apiGroup)
 
 	return s, nil
