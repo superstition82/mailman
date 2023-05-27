@@ -1,8 +1,6 @@
 package models
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "gorm.io/gorm"
 
 type Status string
 
@@ -14,7 +12,6 @@ const (
 
 type Recipient struct {
 	gorm.Model
-	ID uint64 `gorm:"primary_key"`
 
 	Email  string
 	Status Status

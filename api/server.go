@@ -1,17 +1,17 @@
-package server
+package api
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 
 	"probemail/db"
-	"probemail/server/config"
+	"probemail/util"
 )
 
 // Server serves HTTP requests for our banking service.
@@ -19,11 +19,11 @@ type Server struct {
 	e  *echo.Echo
 	db *gorm.DB
 
-	Config *config.Config
+	Config *util.Config
 }
 
-// New creates a new HTTP server and set up routing.
-func New(ctx context.Context, config *config.Config) (*Server, error) {
+// NewServer creates a new HTTP server and set up routing.
+func NewServer(ctx context.Context, config *util.Config) (*Server, error) {
 	e := echo.New()
 	e.Debug = true
 	e.HideBanner = true
@@ -46,31 +46,30 @@ func New(ctx context.Context, config *config.Config) (*Server, error) {
 	// default ui
 	embedFrontend(e)
 
-	// default routes
+	// default api routes
 	apiGroup := e.Group("/api")
-	s.registerClientRoutes(apiGroup)
-	s.registerEmailVerifyRoutes(apiGroup)
+	s.registerSmtpRoutes(apiGroup)
 
 	return s, nil
 }
 
-func (s *Server) Start(ctx context.Context) error {
-	return s.e.Start(fmt.Sprintf(":%d", s.Config.Port))
+func (server *Server) Start(ctx context.Context) error {
+	return server.e.Start(fmt.Sprintf(":%d", server.Config.Port))
 }
 
-func (s *Server) Shutdown(ctx context.Context) {
+func (server *Server) Shutdown(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	// Shutdown echo server
-	if err := s.e.Shutdown(ctx); err != nil {
+	if err := server.e.Shutdown(ctx); err != nil {
 		fmt.Printf("Failed to shutdown server, error: %v\n", err)
 	}
 
 	// Close database connection
-	if err := s.db.Close(); err != nil {
-		fmt.Printf("failed to close database, error: %v\n", err)
-	}
+	// if err := server.db.Close(); err != nil {
+	// 	fmt.Printf("failed to close database, error: %v\n", err)
+	// }
 
 	fmt.Printf("probemail stopped properly 👏\n")
 }

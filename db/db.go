@@ -4,18 +4,18 @@ import (
 	"context"
 	"fmt"
 	"probemail/db/models"
-	"probemail/server/config"
+	"probemail/util"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 type DB struct {
 	DBInstance *gorm.DB
-	config     *config.Config
+	config     *util.Config
 }
 
-func NewDB(config *config.Config) *DB {
+func NewDB(config *util.Config) *DB {
 	db := &DB{
 		config: config,
 	}
@@ -29,13 +29,11 @@ func (db *DB) Open(context context.Context) error {
 	}
 
 	// Connect to the database without foreign_key.
-	sqliteDB, err := gorm.Open("sqlite3", db.config.DSN+"?cache=shared&_foreign_keys=0&_journal_mode=WAL")
+	sqliteDB, err := gorm.Open(sqlite.Open(db.config.DSN+"?cache=shared&_foreign_keys=0&_journal_mode=WAL"), &gorm.Config{})
 	if err != nil {
 		return fmt.Errorf("failed to open db with dsn: %s, err: %w", db.config.DSN, err)
 	}
-	sqliteDB.LogMode(true)
 	db.DBInstance = sqliteDB
-
 	models.Migrate(sqliteDB)
 
 	return nil

@@ -8,11 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
+	"probemail/api"
+	"probemail/util"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"probemail/server"
-	_config "probemail/server/config"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	config *_config.Config
+	config *util.Config
 	mode   string
 	port   int
 	data   string
@@ -37,7 +37,7 @@ var (
 		Short: "An self-hosted email manager",
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithCancel(context.Background())
-			s, err := server.New(ctx, config)
+			s, err := api.NewServer(ctx, config)
 			if err != nil {
 				cancel()
 				fmt.Printf("Failed to create server, error: %+v\n", err)
@@ -57,7 +57,6 @@ var (
 			}()
 
 			println(greetingBanner)
-			fmt.Printf("Version %s has started at :%d\n", config.Version, config.Port)
 			if err := s.Start(ctx); err != nil {
 				if err != http.ErrServerClosed {
 					fmt.Printf("failed to start server, error: %+v\n", err)
@@ -109,7 +108,7 @@ func initConfig() {
 	viper.AutomaticEnv()
 	var err error
 
-	config, err = _config.GetConfig()
+	config, err = util.GetConfig()
 	if err != nil {
 		fmt.Printf("failed to get config, error: %+v\n", err)
 		return
@@ -123,8 +122,3 @@ func initConfig() {
 	println("version:", config.Version)
 	println("---")
 }
-
-const (
-	setupCmdFlagHostUsername = "host-username"
-	setupCmdFlagHostPassword = "host-password"
-)
