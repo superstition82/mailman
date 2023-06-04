@@ -2,19 +2,19 @@ package store
 
 import (
 	"database/sql"
-	"pocketmail/server/profile"
+	"pocketmail/server/config"
 )
 
 // Store provides database access to all raw objects.
 type Store struct {
-	Profile *profile.Profile
-	db      *sql.DB
+	config *config.Config
+	db     *sql.DB
 }
 
 // New creates a new instance of Store.
-func New(db *sql.DB, profile *profile.Profile) *Store {
+func New(db *sql.DB, config *config.Config) *Store {
 	return &Store{
-		Profile: profile,
-		db:      db,
+		config: config,
+		db:     db,
 	}
 }

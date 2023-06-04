@@ -7,8 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"pocketmail/server/profile"
+	"pocketmail/server/config"
 )
 
 //go:embed migration
@@ -17,12 +16,12 @@ var migrationFS embed.FS
 type DB struct {
 	// sqlite db connection instance
 	DBInstance *sql.DB
-	profile    *profile.Profile
+	config     *config.Config
 }
 
-func NewDB(profile *profile.Profile) *DB {
+func NewDB(config *config.Config) *DB {
 	db := &DB{
-		profile: profile,
+		config: config,
 	}
 
 	return db
@@ -30,20 +29,20 @@ func NewDB(profile *profile.Profile) *DB {
 
 func (db *DB) Open(ctx context.Context) (err error) {
 	// Ensure a DSN is set before attempting to open the database.
-	if db.profile.DSN == "" {
+	if db.config.DSN == "" {
 		return fmt.Errorf("dsn required")
 	}
 
 	// Connect to the database without foreign_key.
-	sqliteDB, err := sql.Open("sqlite", db.profile.DSN+"?cache=shared&_foreign_keys=0&_journal_mode=WAL")
+	sqliteDB, err := sql.Open("sqlite", db.config.DSN+"?cache=shared&_foreign_keys=0&_journal_mode=WAL")
 	if err != nil {
-		return fmt.Errorf("failed to open db with dsn: %s, err: %w", db.profile.DSN, err)
+		return fmt.Errorf("failed to open db with dsn: %s, err: %w", db.config.DSN, err)
 	}
 	db.DBInstance = sqliteDB
 
-	if db.profile.Mode == "prod" {
+	if db.config.Mode == "prod" {
 		// If db file not exists, we should migrate the database.
-		if _, err := os.Stat(db.profile.DSN); errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(db.config.DSN); errors.Is(err, os.ErrNotExist) {
 			if err := db.applyLatestSchema(ctx); err != nil {
 				return fmt.Errorf("failed to apply latest schema: %w", err)
 			}
@@ -51,7 +50,7 @@ func (db *DB) Open(ctx context.Context) (err error) {
 		println("end migrate")
 	} else {
 		// In non-prod mode, we should always migrate the database.
-		if _, err := os.Stat(db.profile.DSN); errors.Is(err, os.ErrNotExist) {
+		if _, err := os.Stat(db.config.DSN); errors.Is(err, os.ErrNotExist) {
 			if err := db.applyLatestSchema(ctx); err != nil {
 				return fmt.Errorf("failed to apply latest schema: %w", err)
 			}
@@ -68,7 +67,7 @@ const (
 
 func (db *DB) applyLatestSchema(ctx context.Context) error {
 	schemaMode := "dev"
-	if db.profile.Mode == "prod" {
+	if db.config.Mode == "prod" {
 		schemaMode = "prod"
 	}
 	latestSchemaPath := fmt.Sprintf("%s/%s/%s", "migration", schemaMode, latestSchemaFileName)

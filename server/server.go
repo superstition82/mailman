@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"pocketmail/server/profile"
+	"pocketmail/server/config"
 	"pocketmail/store"
 	"pocketmail/store/db"
 	"time"
@@ -18,28 +18,28 @@ type Server struct {
 	e  *echo.Echo
 	db *sql.DB
 
-	ID      string
-	Profile *profile.Profile
-	Store   *store.Store
+	ID     string
+	Config *config.Config
+	Store  *store.Store
 }
 
-func NewServer(ctx context.Context, profile *profile.Profile) (*Server, error) {
+func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	e := echo.New()
 	e.Debug = true
 	e.HideBanner = true
 	e.HidePort = true
 
-	db := db.NewDB(profile)
+	db := db.NewDB(config)
 	if err := db.Open(ctx); err != nil {
 		return nil, errors.Wrap(err, "cannot open db")
 	}
 
 	s := &Server{
-		e:       e,
-		db:      db.DBInstance,
-		Profile: profile,
+		e:      e,
+		db:     db.DBInstance,
+		Config: config,
 	}
-	storeInstance := store.New(db.DBInstance, profile)
+	storeInstance := store.New(db.DBInstance, config)
 	s.Store = storeInstance
 
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -63,7 +63,7 @@ func NewServer(ctx context.Context, profile *profile.Profile) (*Server, error) {
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	return s.e.Start(fmt.Sprintf(":%d", s.Profile.Port))
+	return s.e.Start(fmt.Sprintf(":%d", s.Config.Port))
 }
 
 func (s *Server) Shutdown(ctx context.Context) {

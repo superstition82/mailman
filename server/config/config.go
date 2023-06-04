@@ -1,4 +1,4 @@
-package profile
+package config
 
 import (
 	"fmt"
@@ -10,8 +10,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Profile is the configuration to start main server.
-type Profile struct {
+// Config is the configuration to start main server.
+type Config struct {
 	// Mode can be "prod" or "dev"
 	Mode string `json:"mode"`
 	// Port is the binding port for server
@@ -24,7 +24,7 @@ type Profile struct {
 	Version string `json:"version"`
 }
 
-func (p *Profile) IsDev() bool {
+func (p *Config) IsDev() bool {
 	return p.Mode != "prod"
 }
 
@@ -49,38 +49,38 @@ func checkDSN(dataDir string) (string, error) {
 	return dataDir, nil
 }
 
-// GetProfile will return a profile for dev or prod.
-func GetProfile() (*Profile, error) {
-	profile := Profile{}
-	err := viper.Unmarshal(&profile)
+// Getconfig will return a config for dev or prod.
+func Getconfig() (*Config, error) {
+	config := Config{}
+	err := viper.Unmarshal(&config)
 	if err != nil {
 		return nil, err
 	}
 
-	if profile.Mode == "prod" && profile.Data == "" {
+	if config.Mode == "prod" && config.Data == "" {
 		if runtime.GOOS == "windows" {
-			profile.Data = filepath.Join(os.Getenv("ProgramData"), "pocketmail")
+			config.Data = filepath.Join(os.Getenv("ProgramData"), "pocketmail")
 
-			if _, err := os.Stat(profile.Data); os.IsNotExist(err) {
-				if err := os.MkdirAll(profile.Data, 0770); err != nil {
-					fmt.Printf("Failed to create data directory: %s, err: %+v\n", profile.Data, err)
+			if _, err := os.Stat(config.Data); os.IsNotExist(err) {
+				if err := os.MkdirAll(config.Data, 0770); err != nil {
+					fmt.Printf("Failed to create data directory: %s, err: %+v\n", config.Data, err)
 					return nil, err
 				}
 			}
 		} else {
-			profile.Data = "/var/opt/pocketmail"
+			config.Data = "/var/opt/pocketmail"
 		}
 	}
 
-	dataDir, err := checkDSN(profile.Data)
+	dataDir, err := checkDSN(config.Data)
 	if err != nil {
 		fmt.Printf("Failed to check dsn: %s, err: %+v\n", dataDir, err)
 		return nil, err
 	}
 
-	profile.Data = dataDir
-	dbFile := fmt.Sprintf("pocketmail_%s.db", profile.Mode)
-	profile.DSN = filepath.Join(dataDir, dbFile)
+	config.Data = dataDir
+	dbFile := fmt.Sprintf("pocketmail_%s.db", config.Mode)
+	config.DSN = filepath.Join(dataDir, dbFile)
 
-	return &profile, nil
+	return &config, nil
 }
