@@ -18,8 +18,8 @@ CREATE TABLE recepient (
   id      INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
-  email   TEXT NOT NULL,
-  status  TEXT NOT NULL
+  email      TEXT NOT NULL,
+  reachable  TEXT NOT NULL
 );
 
 CREATE TABLE sender (

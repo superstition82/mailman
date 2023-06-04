@@ -6,27 +6,27 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"pocketmail/server"
-	"pocketmail/server/config"
 	"syscall"
+
+	"pocketmail/server"
+	_config "pocketmail/server/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var (
-	cfg *config.Config
-
-	mode string
-	port int
-	data string
+	config *_config.Config
+	mode   string
+	port   int
+	data   string
 
 	rootCmd = &cobra.Command{
 		Use:   "pocketmail",
 		Short: `이메일 검증, 이메일 템플릿 관리, 발송 기능을 지원하는 웹 서비스입니다`,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithCancel(context.Background())
-			s, err := server.NewServer(ctx, cfg)
+			s, err := server.NewServer(ctx, config)
 			if err != nil {
 				cancel()
 				fmt.Printf("failed to create server, error: %+v\n", err)
@@ -45,7 +45,7 @@ var (
 				cancel()
 			}()
 
-			fmt.Printf("Version %s has started at :%d\n", cfg.Version, cfg.Port)
+			fmt.Printf("Version %s has started at :%d\n", config.Version, config.Port)
 			if err := s.Start(ctx); err != nil {
 				if err != http.ErrServerClosed {
 					fmt.Printf("failed to start server, error: %+v\n", err)
@@ -78,13 +78,13 @@ var (
 				return
 			}
 
-			db := db.NewDB(cfg)
+			db := db.NewDB(config)
 			if err := db.Open(ctx); err != nil {
 				fmt.Printf("failed to open db, error: %+v\n", err)
 				return
 			}
 
-			store := store.New(db.DBInstance, cfg)
+			store := store.New(db.DBInstance, config)
 			if err := setup.Execute(ctx, store, hostUsername, hostPassword); err != nil {
 				fmt.Printf("failed to setup, error: %+v\n", err)
 				return
@@ -131,18 +131,18 @@ func init() {
 func initConfig() {
 	viper.AutomaticEnv()
 	var err error
-	cfg, err = config.Getconfig()
+	config, err = _config.Getconfig()
 	if err != nil {
-		fmt.Printf("failed to get cfg, error: %+v\n", err)
+		fmt.Printf("failed to get config, error: %+v\n", err)
 		return
 	}
 
 	println("---")
 	println("Server config")
-	println("dsn:", cfg.DSN)
-	println("port:", cfg.Port)
-	println("mode:", cfg.Mode)
-	println("version:", cfg.Version)
+	println("dsn:", config.DSN)
+	println("port:", config.Port)
+	println("mode:", config.Mode)
+	println("version:", config.Version)
 	println("---")
 }
 

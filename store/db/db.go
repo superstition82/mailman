@@ -23,7 +23,6 @@ func NewDB(config *config.Config) *DB {
 	db := &DB{
 		config: config,
 	}
-
 	return db
 }
 

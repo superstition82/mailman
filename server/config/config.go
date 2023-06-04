@@ -79,7 +79,7 @@ func Getconfig() (*Config, error) {
 	}
 
 	config.Data = dataDir
-	dbFile := fmt.Sprintf("pocketmail_%s.db", config.Mode)
+	dbFile := fmt.Sprintf("pocketmail_%s.sqlite", config.Mode)
 	config.DSN = filepath.Join(dataDir, dbFile)
 
 	return &config, nil

@@ -19,8 +19,9 @@ http POST localhost:8081/api/smtp \
 
 ### To
 
-- /api/v0/recipients/
-  - 수신자 생성, 목록
+- [ ] /api/v0/recipients/
+  - [ ] 생성
+  - [ ] 목록
 - /api/v0/recipients/<recipient_id>/
   - 수신자 조회, 수정, 삭제
 - POST /api/v0/recipients/verify

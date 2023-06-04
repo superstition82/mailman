@@ -71,7 +71,7 @@ type ListUsersParams struct {
 	Offset int64
 }
 
-func (s *Store) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error) {
+func (s *Store) ListUsers(ctx context.Context, arg ListRecepientsParams) ([]User, error) {
 	rows, err := s.db.QueryContext(ctx, listUseres, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err

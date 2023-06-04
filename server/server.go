@@ -19,8 +19,8 @@ type Server struct {
 	db *sql.DB
 
 	ID     string
-	Config *config.Config
-	Store  *store.Store
+	config *config.Config
+	store  *store.Store
 }
 
 func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
@@ -37,21 +37,18 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	s := &Server{
 		e:      e,
 		db:     db.DBInstance,
-		Config: config,
+		config: config,
 	}
 	storeInstance := store.New(db.DBInstance, config)
-	s.Store = storeInstance
+	s.store = storeInstance
 
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: `{"time":"${time_rfc3339}",` +
 			`"method":"${method}","uri":"${uri}",` +
 			`"status":${status},"error":"${error}"}` + "\n",
 	}))
-
 	e.Use(middleware.Gzip())
-
 	e.Use(middleware.CORS())
-
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
 		ErrorMessage: "Request timeout",
 		Timeout:      30 * time.Second,
@@ -59,11 +56,21 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 
 	embedFrontend(e)
 
+	apiGroup := e.Group("/api")
+
+	// recepient group
+	recepientGroup := apiGroup.Group("/recepient")
+	recepientGroup.POST("", s.createRecepient)
+	recepientGroup.GET("", s.listRecepients)
+	recepientGroup.GET("/:recepientId", s.getRecepient)
+	recepientGroup.DELETE("/:recepientId", s.deleteRecepient)
+	recepientGroup.POST("/:recepientId/verification", s.validateRecepient)
+
 	return s, nil
 }
 
 func (s *Server) Start(ctx context.Context) error {
-	return s.e.Start(fmt.Sprintf(":%d", s.Config.Port))
+	return s.e.Start(fmt.Sprintf(":%d", s.config.Port))
 }
 
 func (s *Server) Shutdown(ctx context.Context) {
@@ -81,8 +88,4 @@ func (s *Server) Shutdown(ctx context.Context) {
 	}
 
 	fmt.Printf("memos stopped properly\n")
-}
-
-func (s *Server) GetEcho() *echo.Echo {
-	return s.e
 }
