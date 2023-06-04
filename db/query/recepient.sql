@@ -5,8 +5,7 @@ WHERE id = ? LIMIT 1;
 -- name: ListRecepients :many
 SELECT * FROM recepient
 ORDER BY id
-LIMIT ?
-OFFSET ?;
+LIMIT ? OFFSET ?;
 
 -- name: CreateRecepient :one
 INSERT INTO recepient (email, status) 
