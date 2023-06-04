@@ -6,7 +6,7 @@ export const useLayoutStore = () => {
   return {
     state,
     getState: () => {
-      return store.getState().tag;
+      return store.getState();
     },
     setHeaderStatus: (showHeader: boolean) => {
       store.dispatch(setHeaderStatus(showHeader));
