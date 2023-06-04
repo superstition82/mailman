@@ -33,7 +33,7 @@ export const Header: React.FC = () => {
         onClick={() => layoutStore.setHeaderStatus(false)}
       ></div>
       <header
-        className={`relative w-56 sm:w-full h-full max-h-screen overflow-auto hide-scrollbar flex flex-col justify-start items-start py-4 z-30 bg-zinc-100 dark:bg-zinc-800 sm:bg-transparent sm:shadow-none transition-all duration-300 -translate-x-full sm:translate-x-0 ${
+        className={`relative w-56 sm:w-full h-full max-h-screen overflow-auto hide-scrollbar flex flex-col justify-start items-start py-4 z-30 bg-zinc-100 sm:bg-transparent sm:shadow-none transition-all duration-300 -translate-x-full sm:translate-x-0 ${
           showHeader && "translate-x-0 shadow-2xl"
         }`}
       >
@@ -44,8 +44,8 @@ export const Header: React.FC = () => {
               id="header-home"
               className={({ isActive }) =>
                 `${
-                  isActive && "bg-white dark:bg-zinc-700 shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 dark:text-gray-300 hover:bg-white hover:shadow dark:hover:bg-zinc-700`
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
@@ -57,8 +57,8 @@ export const Header: React.FC = () => {
               id="header-review"
               className={({ isActive }) =>
                 `${
-                  isActive && "bg-white dark:bg-zinc-700 shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 dark:text-gray-300 hover:bg-white hover:shadow dark:hover:bg-zinc-700`
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
@@ -70,8 +70,8 @@ export const Header: React.FC = () => {
               id="header-resources"
               className={({ isActive }) =>
                 `${
-                  isActive && "bg-white dark:bg-zinc-700 shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 dark:text-gray-300 hover:bg-white hover:shadow dark:hover:bg-zinc-700`
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
@@ -84,8 +84,8 @@ export const Header: React.FC = () => {
             id="header-explore"
             className={({ isActive }) =>
               `${
-                isActive && "bg-white dark:bg-zinc-700 shadow"
-              } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 dark:text-gray-300 hover:bg-white hover:shadow dark:hover:bg-zinc-700`
+                isActive && "bg-white shadow"
+              } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
             }
           >
             <>
@@ -98,8 +98,8 @@ export const Header: React.FC = () => {
               id="header-setting"
               className={({ isActive }) =>
                 `${
-                  isActive && "bg-white dark:bg-zinc-700 shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 dark:text-gray-300 hover:bg-white hover:shadow dark:hover:bg-zinc-700`
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
@@ -111,8 +111,8 @@ export const Header: React.FC = () => {
               id="header-setting"
               className={({ isActive }) =>
                 `${
-                  isActive && "bg-white dark:bg-zinc-700 shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 dark:text-gray-300 hover:bg-white hover:shadow dark:hover:bg-zinc-700`
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
@@ -121,7 +121,7 @@ export const Header: React.FC = () => {
             </NavLink>
             <div className="pr-3 pl-1 w-full">
               <button
-                className="mt-2 w-full py-3 rounded-full flex flex-row justify-center items-center bg-green-600 text-white dark:opacity-80 hover:shadow hover:opacity-90"
+                className="mt-2 w-full py-3 rounded-full flex flex-row justify-center items-center bg-green-600 text-white hover:shadow hover:opacity-90"
                 // onClick={() => showMemoEditorDialog()}
               >
                 <Icon.Edit3 className="w-4 h-auto mr-1" /> New

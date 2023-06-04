@@ -4,8 +4,10 @@ import { CssVarsProvider } from "@mui/joy";
 import { Provider } from "react-redux";
 
 import store from "./store";
-import theme from "./theme";
 import { App } from "./App.tsx";
+import theme from "./theme";
+
+import "./styles/global.css";
 import "./styles/tailwind.css";
 
 const container = document.getElementById("root");
