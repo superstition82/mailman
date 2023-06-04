@@ -17,9 +17,9 @@ type Recepient struct {
 }
 
 const createRecepient = `
-INSERT INTO recepient (email, reachable) 
-VALUES (?, ?)
-RETURNING id, email, reachable, created_ts, updated_ts
+	INSERT INTO recepient (email, reachable) 
+	VALUES (?, ?)
+	RETURNING id, email, reachable, created_ts, updated_ts
 `
 
 type CreateRecepientParams struct {
@@ -35,8 +35,8 @@ func (s *Store) CreateRecepient(ctx context.Context, arg CreateRecepientParams) 
 }
 
 const deleteRecepient = `
-DELETE FROM recepient
-WHERE id = ?
+	DELETE FROM recepient
+	WHERE id = ?
 `
 
 func (s *Store) DeleteRecepient(ctx context.Context, id int) error {
@@ -45,9 +45,9 @@ func (s *Store) DeleteRecepient(ctx context.Context, id int) error {
 }
 
 const getRecepient = `
-SELECT id, email, reachable, created_ts, updated_ts 
-FROM recepient
-WHERE id = ? LIMIT 1
+	SELECT id, email, reachable, created_ts, updated_ts 
+	FROM recepient
+	WHERE id = ? LIMIT 1
 `
 
 func (s *Store) GetRecepient(ctx context.Context, id int) (Recepient, error) {
@@ -58,9 +58,9 @@ func (s *Store) GetRecepient(ctx context.Context, id int) (Recepient, error) {
 }
 
 const listRecepients = `
-SELECT id, email, reachable, created_ts, updated_ts  
-FROM recepient
-ORDER BY id LIMIT ? OFFSET ?
+	SELECT id, email, reachable, created_ts, updated_ts  
+	FROM recepient
+	ORDER BY id LIMIT ? OFFSET ?
 `
 
 type ListRecepientsParams struct {
@@ -94,13 +94,13 @@ func (s *Store) ListRecepients(ctx context.Context, arg ListRecepientsParams) ([
 }
 
 const updateRecepient = `
-UPDATE recepient
-SET 
-	email = COALESCE(?, email),
-	reachable = COALESCE(?, reachable)
-WHERE
-	id = ?
-RETURNING id, email, reachable, created_ts, updated_ts
+	UPDATE recepient
+	SET 
+		email = COALESCE(?, email),
+		reachable = COALESCE(?, reachable)
+	WHERE
+		id = ?
+	RETURNING id, email, reachable, created_ts, updated_ts
 `
 
 type UpdateRecepientParams struct {

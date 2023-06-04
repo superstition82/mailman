@@ -26,6 +26,8 @@ CREATE TABLE sender (
   id       INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  host     TEXT NOT NULL,
+  port     INTEGER NOT NULL,
   email    TEXT NOT NULL,
   password TEXT NOT NULL
 );
