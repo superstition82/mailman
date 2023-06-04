@@ -7,6 +7,10 @@ tmp
 # Frontend asset
 web/dist
 
+# Server embedding
+server/dist/*
+!server/dist/index.html
+
 # build folder
 build
 
