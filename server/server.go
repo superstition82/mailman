@@ -54,6 +54,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 		Timeout:      30 * time.Second,
 	}))
 
+	// frontend embedding with FS
 	embedFrontend(e)
 
 	apiGroup := e.Group("/api")
@@ -65,6 +66,13 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	recepientGroup.GET("/:recepientId", s.getRecepient)
 	recepientGroup.DELETE("/:recepientId", s.deleteRecepient)
 	recepientGroup.POST("/:recepientId/verification", s.validateRecepient)
+
+	// sender group
+	senderGroup := apiGroup.Group("/sender")
+	senderGroup.POST("", s.createSender)
+	senderGroup.GET("", s.listSenders)
+	senderGroup.GET("/:senderId", s.getSender)
+	senderGroup.DELETE("/:senderId", s.deleteSender)
 
 	return s, nil
 }

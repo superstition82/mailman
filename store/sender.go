@@ -47,21 +47,13 @@ func (s *Store) CreateSender(ctx context.Context, arg CreateSenderParams) (Sende
 const getSender = `
 	SELECT id, host, port, email, password, created_ts, updated_ts
 	FROM sender
-	WEHRE id = ? LIMIT 1	
+	WHERE id = ? LIMIT 1
 `
 
 func (s *Store) GetSender(ctx context.Context, id int) (Sender, error) {
 	row := s.db.QueryRowContext(ctx, getSender, id)
 	var sender Sender
-	err := row.Scan(
-		&sender.ID,
-		&sender.Host,
-		&sender.Port,
-		&sender.Email,
-		&sender.Password,
-		&sender.CreatedTs,
-		&sender.UpdatedTs,
-	)
+	err := row.Scan(&sender.ID, &sender.Host, &sender.Port, &sender.Email, &sender.Password, &sender.CreatedTs, &sender.UpdatedTs)
 	return sender, err
 }
 

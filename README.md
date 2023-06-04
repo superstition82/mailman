@@ -12,25 +12,25 @@ http POST localhost:8081/api/smtp \
 
 ## API Docs
 
-### From
+### sender
 
-- /api/v0/smtp/
-  - SMTP 생성, 목록
+- /api/sender/
+  - sender 생성, 목록
 
-### To
+### recipient
 
-- [ ] /api/v0/recipients/
-  - [ ] 생성
-  - [ ] 목록
-- /api/v0/recipients/<recipient_id>/
-  - 수신자 조회, 수정, 삭제
-- POST /api/v0/recipients/verify
+- [x] /api/recipients/
+  - [x] 생성
+  - [x] 목록
+- [x] /api/recipients/<recipient_id>/
+  - 수신자 조회, 삭제
+- [x] /api/recipients/<recipient_id>/verification
   - ID 리스트를 받아 검증 시작
 
-### Template
+### template
 
-- /api/v0/templates/
+- /api/templates/
   - 템플릿 생성, 목록
-- /api/v0/templates/<template_id>/
+- /api/templates/<template_id>/
   - 템플릿 조회, 수정, 삭제
   - 이미지, 파일 업로드 기능
