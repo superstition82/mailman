@@ -65,4 +65,13 @@ const recepientSlice = createSlice({
   },
 });
 
+export const {
+  createRecepient,
+  deleteRecepient,
+  setIsFetching,
+  toggleSelect,
+  toggleSelectAll,
+  upsertRecepients,
+} = recepientSlice.actions;
+
 export default recepientSlice.reducer;

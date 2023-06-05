@@ -33,3 +33,26 @@ export function deleteSender(senderId: SenderId) {
 /**
  * recepient group
  */
+export function getRecepientList(recepientFind?: RecepientFind) {
+  return axios.get<ResponseObject<Recepient[]>>(`/api/recepient`, {
+    params: {
+      offset: recepientFind?.offset,
+      limit: recepientFind?.limit,
+    },
+  });
+}
+
+export function getRecepientById(recepientId: RecepientId) {
+  return axios.get<ResponseObject<Recepient>>(`/api/recepient/${recepientId}`);
+}
+
+export function createRecepient(recepientCreate: RecepientCreate) {
+  return axios.post<ResponseObject<Recepient>>(
+    `/api/recepient`,
+    recepientCreate
+  );
+}
+
+export function deleteRecepient(recepientId: RecepientId) {
+  return axios.delete(`/api/recepient/${recepientId}`);
+}
