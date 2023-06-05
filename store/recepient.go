@@ -12,8 +12,8 @@ type Recepient struct {
 	Reachable string `json:"reachable"`
 
 	// Standard fields
-	CreatedTs int64 `json:"created_ts"`
-	UpdatedTs int64 `json:"updated_ts"`
+	CreatedTs int64 `json:"createdTs"`
+	UpdatedTs int64 `json:"updatedTs"`
 }
 
 const createRecepient = `

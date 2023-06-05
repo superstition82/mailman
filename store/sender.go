@@ -12,8 +12,8 @@ type Sender struct {
 	Password string `json:"password"`
 
 	// Standard fields
-	CreatedTs int64 `json:"created_ts"`
-	UpdatedTs int64 `json:"updated_ts"`
+	CreatedTs int64 `json:"createdTs"`
+	UpdatedTs int64 `json:"updatedTs"`
 }
 
 const createSender = `
