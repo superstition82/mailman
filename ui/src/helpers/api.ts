@@ -6,9 +6,6 @@ type ResponseObject<T> = {
   message?: string;
 };
 
-/**
- * sender group
- */
 export function getSenderList(senderFind?: SenderFind) {
   return axios.get<ResponseObject<Sender[]>>(`/api/sender`, {
     params: {
@@ -30,9 +27,6 @@ export function deleteSender(senderId: SenderId) {
   return axios.delete(`/api/sender/${senderId}`);
 }
 
-/**
- * recepient group
- */
 export function getRecepientList(recepientFind?: RecepientFind) {
   return axios.get<ResponseObject<Recepient[]>>(`/api/recepient`, {
     params: {
@@ -55,4 +49,10 @@ export function createRecepient(recepientCreate: RecepientCreate) {
 
 export function deleteRecepient(recepientId: RecepientId) {
   return axios.delete(`/api/recepient/${recepientId}`);
+}
+
+export function validateRecepient(recepientId: RecepientId) {
+  return axios.post<ResponseObject<Recepient>>(
+    `/api/recepient/${recepientId}/verification`
+  );
 }

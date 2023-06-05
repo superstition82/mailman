@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useSenderStore } from "../../store/module/sender";
+import Icon from "../Icon";
 
 function SenderManagementTable() {
   const senderStore = useSenderStore();
@@ -26,7 +27,7 @@ function SenderManagementTable() {
   };
 
   return (
-    <div className="flex flex-col rounded-md px-2 mb-8 bg-white ">
+    <div className="flex flex-col rounded-sm px-2 mb-8 bg-white ">
       <Sheet
         sx={{
           "--TableCell-height": "40px",
@@ -34,7 +35,7 @@ function SenderManagementTable() {
         }}
       >
         <TableVirtuoso
-          style={{ height: 400 }}
+          style={{ height: "65vh" }}
           data={senders}
           components={{
             Table: (props) => (
@@ -73,7 +74,7 @@ function SenderManagementTable() {
               <th>이메일</th>
             </tr>
           )}
-          itemContent={(idx, sender) => (
+          itemContent={(_, sender) => (
             <>
               <td onClick={(event) => handleClick(event, sender.id)}>
                 <Checkbox
@@ -81,7 +82,7 @@ function SenderManagementTable() {
                   sx={{ verticalAlign: "top" }}
                 />
               </td>
-              <td>{idx + 1}</td>
+              <td>{sender.id}</td>
               <td>{sender.host}</td>
               <td>{sender.email}</td>
             </>
@@ -89,11 +90,8 @@ function SenderManagementTable() {
         />
       </Sheet>
       <div className="p-2 flex justify-end gap-1">
-        <button
-          className="px-3 py-1 bg-red-500 hover:bg-red-700 text-white text-sm font-bold rounded"
-          onClick={handleDeleteSelected}
-        >
-          선택삭제
+        <button className="flex gap-2 px-4" onClick={handleDeleteSelected}>
+          <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택삭제
         </button>
       </div>
     </div>

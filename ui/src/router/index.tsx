@@ -17,11 +17,11 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/sender-management",
+        path: "/manage/sender",
         element: <SenderManagement />,
       },
       {
-        path: "/recepient-management",
+        path: "/manage/recepient",
         element: <RecepientManagement />,
       },
     ],
