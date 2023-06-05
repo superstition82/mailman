@@ -65,6 +65,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	recepientGroup.GET("", s.listRecepients)
 	recepientGroup.GET("/:recepientId", s.getRecepient)
 	recepientGroup.DELETE("/:recepientId", s.deleteRecepient)
+	recepientGroup.POST("/bulk-delete", s.deleteBulkRecepient)
 	recepientGroup.POST("/:recepientId/verification", s.validateRecepient)
 
 	// sender group
@@ -73,6 +74,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	senderGroup.GET("", s.listSenders)
 	senderGroup.GET("/:senderId", s.getSender)
 	senderGroup.DELETE("/:senderId", s.deleteSender)
+	senderGroup.POST("/bulk-delete", s.deleteBulkSender)
 
 	return s, nil
 }

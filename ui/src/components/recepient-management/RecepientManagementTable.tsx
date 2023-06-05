@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Checkbox, FormLabel, Input, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useRecepientStore } from "../../store/module/recepient";
+import Icon from "../Icon";
 
 function RecepientManagementTable() {
   const recepientStore = useRecepientStore();
@@ -93,7 +94,7 @@ function RecepientManagementTable() {
       </Sheet>
       <div className="p-2 flex justify-end gap-1">
         <>
-          <FormLabel>대기시간(ms): </FormLabel>
+          <FormLabel>대기시간(ms)</FormLabel>
           <Input
             className="w-20"
             size="sm"
@@ -104,6 +105,14 @@ function RecepientManagementTable() {
             onChange={handleChange}
             aria-label="초(ms)"
           />
+          <button
+            className="flex gap-2 px-4"
+            onClick={() => {
+              console.log("hello");
+            }}
+          >
+            <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택삭제
+          </button>
         </>
       </div>
     </div>

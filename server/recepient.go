@@ -103,6 +103,29 @@ func (server *Server) deleteRecepient(c echo.Context) error {
 	return c.JSON(http.StatusOK, true)
 }
 
+type deleteBulkRecepientRequestBody struct {
+	Recepients []int `json:"recepients"`
+}
+
+func (server *Server) deleteBulkRecepient(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var body deleteBulkRecepientRequestBody
+	if err := c.Bind(&body); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: "bad request",
+		})
+	}
+
+	if err := server.store.DeleteBulkRecepient(ctx, body.Recepients); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: "bad request",
+		})
+	}
+
+	return c.JSON(http.StatusOK, true)
+}
+
 var (
 	verifier = emailverifier.
 		NewVerifier().

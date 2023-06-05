@@ -137,3 +137,26 @@ func (server *Server) deleteSender(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, true)
 }
+
+type deleteBulkSenderRequestBody struct {
+	Senders []int `json:"senders"`
+}
+
+func (server *Server) deleteBulkSender(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var body deleteBulkSenderRequestBody
+	if err := c.Bind(&body); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: "bad request",
+		})
+	}
+
+	if err := server.store.DeleteBulkSender(ctx, body.Senders); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: "bad request",
+		})
+	}
+
+	return c.JSON(http.StatusOK, true)
+}

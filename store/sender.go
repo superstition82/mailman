@@ -1,6 +1,9 @@
 package store
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type Sender struct {
 	ID int `json:"id"`
@@ -108,4 +111,26 @@ const deleteSender = `
 func (s *Store) DeleteSender(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, deleteSender, id)
 	return err
+}
+
+func (s *Store) DeleteBulkSender(ctx context.Context, ids []int) error {
+	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, id := range ids {
+		_, err = tx.Exec(deleteSender, id)
+		if err != nil {
+			tx.Rollback()
+			return nil
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil
+	}
+
+	return nil
 }
