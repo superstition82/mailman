@@ -35,38 +35,6 @@ func (s *Store) CreateRecepient(ctx context.Context, arg CreateRecepientParams) 
 	return recepient, err
 }
 
-const deleteRecepient = `
-	DELETE FROM recepient
-	WHERE id = ?
-`
-
-func (s *Store) DeleteRecepient(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, deleteRecepient, id)
-	return err
-}
-
-func (s *Store) DeleteBulkRecepient(ctx context.Context, ids []int) error {
-	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{})
-	if err != nil {
-		return err
-	}
-
-	for _, id := range ids {
-		_, err = tx.Exec(deleteRecepient, id)
-		if err != nil {
-			tx.Rollback()
-			return nil
-		}
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil
-	}
-
-	return nil
-}
-
 const getRecepient = `
 	SELECT id, email, reachable, created_ts, updated_ts 
 	FROM recepient
@@ -78,6 +46,36 @@ func (s *Store) GetRecepient(ctx context.Context, id int) (Recepient, error) {
 	var recepient Recepient
 	err := row.Scan(&recepient.ID, &recepient.Email, &recepient.Reachable, &recepient.CreatedTs, &recepient.UpdatedTs)
 	return recepient, err
+}
+
+const listAllRecepients = `
+	SELECT id, email, reachable, created_ts, updated_ts  
+	FROM recepient
+	ORDER BY id
+`
+
+func (s *Store) ListAllRecepients(ctx context.Context) ([]Recepient, error) {
+	rows, err := s.db.QueryContext(ctx, listAllRecepients)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Recepient
+	for rows.Next() {
+		var recepient Recepient
+		if err := rows.Scan(&recepient.ID, &recepient.Email, &recepient.Reachable, &recepient.CreatedTs, &recepient.UpdatedTs); err != nil {
+			return nil, err
+		}
+		items = append(items, recepient)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }
 
 const listRecepients = `
@@ -139,4 +137,36 @@ func (s *Store) UpdateRecepient(ctx context.Context, arg UpdateRecepientParams) 
 	var recepient Recepient
 	err := row.Scan(&recepient.ID, &recepient.Email, &recepient.Reachable, &recepient.CreatedTs, &recepient.UpdatedTs)
 	return recepient, err
+}
+
+const deleteRecepient = `
+	DELETE FROM recepient
+	WHERE id = ?
+`
+
+func (s *Store) DeleteRecepient(ctx context.Context, id int) error {
+	_, err := s.db.ExecContext(ctx, deleteRecepient, id)
+	return err
+}
+
+func (s *Store) DeleteBulkRecepient(ctx context.Context, ids []int) error {
+	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, id := range ids {
+		_, err = tx.Exec(deleteRecepient, id)
+		if err != nil {
+			tx.Rollback()
+			return nil
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil
+	}
+
+	return nil
 }

@@ -15,25 +15,35 @@ CREATE TABLE user (
 );
 
 CREATE TABLE recepient (
-  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
-  email      TEXT NOT NULL,
-  reachable  TEXT NOT NULL
+  email TEXT NOT NULL,
+  reachable TEXT NOT NULL
 );
 
 CREATE TABLE sender (
-  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
-  email    TEXT NOT NULL,
+  host TEXT NOT NULL,
+  port INTEGER NOT NULL,
+  email TEXT NOT NULL,
   password TEXT NOT NULL
 );
 
 CREATE TABLE template (
-  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
-  subject     TEXT NOT NULL,
-  body        TEXT NOT NULL
+  subject TEXT NOT NULL,
+  body TEXT NOT NULL
 );
+
+CREATE TABLE template_file (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  template_id INTEGER NOT NULL,
+  path TEXT NOT NULL,
+  filesize INTEGER NOT NULL,
+  FOREIGN KEY (template_id) REFRENCES template(id)
+)

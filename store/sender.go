@@ -60,6 +60,36 @@ func (s *Store) GetSender(ctx context.Context, id int) (Sender, error) {
 	return sender, err
 }
 
+const listAllSenders = `
+	SELECT id, host, port, email, password, created_ts, updated_ts
+	FROM sender
+	ORDER BY id
+`
+
+func (s *Store) ListAllSenders(ctx context.Context) ([]Sender, error) {
+	rows, err := s.db.QueryContext(ctx, listAllSenders)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Sender
+	for rows.Next() {
+		var sender Sender
+		if err := rows.Scan(&sender.ID, &sender.Host, &sender.Port, &sender.Email, &sender.Password, &sender.CreatedTs, &sender.UpdatedTs); err != nil {
+			return nil, err
+		}
+		items = append(items, sender)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 const listSenders = `
 	SELECT id, host, port, email, password, created_ts, updated_ts
 	FROM sender
