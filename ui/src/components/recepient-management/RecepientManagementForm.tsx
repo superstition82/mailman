@@ -35,9 +35,9 @@ function RecepientManagementForm() {
           수신자 관리 ({recepients.length}개)
         </h2>
       </div>
-      <div className="w-full flex py-2">
+      <div className="w-full flex mt-4 bg-white rounded-sm">
         <input
-          className="py-2 px-2 w-full text-sm border-b rounded-sm"
+          className="py-2 px-2 w-full text-sm"
           value={form.email}
           name="email"
           placeholder="이메일"
