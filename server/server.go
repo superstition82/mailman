@@ -4,9 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"pocketmail/server/config"
-	"pocketmail/store"
-	"pocketmail/store/db"
+	"mails/server/config"
+	"mails/store"
+	"mails/store/db"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -59,7 +59,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 
 	apiGroup := e.Group("/api")
 
-	// recepient group
+	// recepient api
 	recepientGroup := apiGroup.Group("/recepient")
 	recepientGroup.POST("", s.createRecepient)
 	recepientGroup.GET("", s.listRecepients)
@@ -68,7 +68,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	recepientGroup.POST("/bulk-delete", s.deleteBulkRecepient)
 	recepientGroup.POST("/:recepientId/verification", s.validateRecepient)
 
-	// sender group
+	// sender api
 	senderGroup := apiGroup.Group("/sender")
 	senderGroup.POST("", s.createSender)
 	senderGroup.GET("", s.listSenders)

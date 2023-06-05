@@ -6,8 +6,8 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"mails/server/config"
 	"os"
-	"pocketmail/server/config"
 )
 
 //go:embed migration

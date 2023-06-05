@@ -2,8 +2,8 @@ package server
 
 import (
 	"fmt"
+	"mails/store"
 	"net/http"
-	"pocketmail/store"
 	"strconv"
 
 	emailverifier "github.com/AfterShip/email-verifier"

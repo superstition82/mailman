@@ -2,7 +2,7 @@ package store
 
 import (
 	"database/sql"
-	"pocketmail/server/config"
+	"mails/server/config"
 )
 
 // Store provides database access to all raw objects.

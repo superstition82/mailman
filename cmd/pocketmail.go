@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"pocketmail/server"
-	_config "pocketmail/server/config"
+	"mails/server"
+	_config "mails/server/config"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -22,7 +22,7 @@ var (
 	data   string
 
 	rootCmd = &cobra.Command{
-		Use:   "pocketmail",
+		Use:   "mails",
 		Short: `이메일 검증, 이메일 템플릿 관리, 발송 기능을 지원하는 웹 서비스입니다`,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithCancel(context.Background())

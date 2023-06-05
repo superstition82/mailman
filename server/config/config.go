@@ -18,7 +18,7 @@ type Config struct {
 	Port int `json:"-"`
 	// Data is the data directory
 	Data string `json:"-"`
-	// DSN points to where pocketmail stores its own data
+	// DSN points to where mails stores its own data
 	DSN string `json:"-"`
 	// Version is the current version of server
 	Version string `json:"version"`
@@ -59,7 +59,7 @@ func Getconfig() (*Config, error) {
 
 	if config.Mode == "prod" && config.Data == "" {
 		if runtime.GOOS == "windows" {
-			config.Data = filepath.Join(os.Getenv("ProgramData"), "pocketmail")
+			config.Data = filepath.Join(os.Getenv("ProgramData"), "mails")
 
 			if _, err := os.Stat(config.Data); os.IsNotExist(err) {
 				if err := os.MkdirAll(config.Data, 0770); err != nil {
@@ -68,7 +68,7 @@ func Getconfig() (*Config, error) {
 				}
 			}
 		} else {
-			config.Data = "/var/opt/pocketmail"
+			config.Data = "/var/opt/mails"
 		}
 	}
 
@@ -79,7 +79,7 @@ func Getconfig() (*Config, error) {
 	}
 
 	config.Data = dataDir
-	dbFile := fmt.Sprintf("pocketmail_%s.sqlite", config.Mode)
+	dbFile := fmt.Sprintf("mails_%s.sqlite", config.Mode)
 	config.DSN = filepath.Join(dataDir, dbFile)
 
 	return &config, nil

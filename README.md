@@ -1,4 +1,4 @@
-# pocketmail ✉️
+# mails ✉️
 
 ## API Docs
 

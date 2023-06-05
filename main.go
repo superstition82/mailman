@@ -1,7 +1,7 @@
 package main
 
 import (
-	"pocketmail/cmd"
+	"mails/cmd"
 
 	_ "modernc.org/sqlite"
 )

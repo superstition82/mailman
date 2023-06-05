@@ -3,9 +3,9 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"mails/store"
 	"net/http"
 	"net/smtp"
-	"pocketmail/store"
 	"strconv"
 
 	"github.com/labstack/echo/v4"

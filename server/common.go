@@ -1,8 +1,8 @@
 package server
 
 import (
+	"mails/common"
 	"net/http"
-	"pocketmail/common"
 
 	"github.com/labstack/echo/v4"
 )
