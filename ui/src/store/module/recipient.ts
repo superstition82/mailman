@@ -1,5 +1,5 @@
 import * as api from "../../helpers/api";
-import store, { useAppSelector } from "../";
+import store, { useAppSelector } from "..";
 import * as reducer from "../reducer/recipient";
 import {
   createRecipient,
