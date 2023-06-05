@@ -4,7 +4,7 @@ import { useLayoutStore } from "../store/module/layout";
 import { resolution } from "../utils/layout";
 import Icon from "./Icon";
 
-export const Header: React.FC = () => {
+function Header() {
   const layoutStore = useLayoutStore();
   const showHeader = layoutStore.state.showHeader;
 
@@ -41,28 +41,43 @@ export const Header: React.FC = () => {
           <>
             <NavLink
               to="/"
+              id="header-explore"
+              className={({ isActive }) =>
+                `${
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-2xl flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
+              }
+            >
+              <>
+                <Icon.Hash className="mr-3 w-6 h-auto opacity-70" /> 이메일
+              </>
+            </NavLink>
+            <NavLink
+              to="/sender-management"
               id="header-home"
               className={({ isActive }) =>
                 `${
                   isActive && "bg-white shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
+                } w-full px-4 pr-5 py-2 rounded-2xl flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
-                <Icon.Home className="mr-3 w-6 h-auto opacity-70" /> 홈
+                <Icon.UserCircle className="mr-3 w-6 h-auto opacity-70" />
+                발신자 관리
               </>
             </NavLink>
             <NavLink
-              to="/review"
+              to="/recepient-management"
               id="header-review"
               className={({ isActive }) =>
                 `${
                   isActive && "bg-white shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
+                } w-full px-4 pr-5 py-2 rounded-2xl flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
-                <Icon.Calendar className="mr-3 w-6 h-auto opacity-70" /> 제목
+                <Icon.UserPlus className="mr-3 w-6 h-auto opacity-70" />
+                수신자 관리
               </>
             </NavLink>
             <NavLink
@@ -71,7 +86,7 @@ export const Header: React.FC = () => {
               className={({ isActive }) =>
                 `${
                   isActive && "bg-white shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
+                } w-full px-4 pr-5 py-2 rounded-2xl flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
               }
             >
               <>
@@ -79,57 +94,10 @@ export const Header: React.FC = () => {
               </>
             </NavLink>
           </>
-          <NavLink
-            to="/explore"
-            id="header-explore"
-            className={({ isActive }) =>
-              `${
-                isActive && "bg-white shadow"
-              } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
-            }
-          >
-            <>
-              <Icon.Hash className="mr-3 w-6 h-auto opacity-70" /> 탐색
-            </>
-          </NavLink>
-          <>
-            <NavLink
-              to="/archived"
-              id="header-setting"
-              className={({ isActive }) =>
-                `${
-                  isActive && "bg-white shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
-              }
-            >
-              <>
-                <Icon.Archive className="mr-3 w-6 h-auto opacity-70" /> 아카이브
-              </>
-            </NavLink>
-            <NavLink
-              to="/setting"
-              id="header-setting"
-              className={({ isActive }) =>
-                `${
-                  isActive && "bg-white shadow"
-                } w-full px-4 pr-5 py-2 rounded-full flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
-              }
-            >
-              <>
-                <Icon.Settings className="mr-3 w-6 h-auto opacity-70" /> 설정
-              </>
-            </NavLink>
-            <div className="pr-3 pl-1 w-full">
-              <button
-                className="mt-2 w-full py-3 rounded-full flex flex-row justify-center items-center bg-green-600 text-white hover:shadow hover:opacity-90"
-                // onClick={() => showMemoEditorDialog()}
-              >
-                <Icon.Edit3 className="w-4 h-auto mr-1" /> New
-              </button>
-            </div>
-          </>
         </div>
       </header>
     </div>
   );
-};
+}
+
+export default Header;

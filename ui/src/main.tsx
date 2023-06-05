@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import { CssVarsProvider } from "@mui/joy";
 import { Provider } from "react-redux";
 
-import store from "./store/index.ts";
 import { App } from "./App.tsx";
+import store from "./store/index.ts";
 import theme from "./theme/index.ts";
 
 import "./styles/global.css";
@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(container as HTMLElement);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <CssVarsProvider theme={theme}>
+      <CssVarsProvider defaultMode="light" theme={theme}>
         <App />
       </CssVarsProvider>
     </Provider>
