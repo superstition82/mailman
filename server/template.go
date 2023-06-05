@@ -92,12 +92,26 @@ func (server *Server) updateTemplate(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("templateId")))
 	}
+	template, err := server.store.GetTemplate(ctx, templateId)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: err.Error(),
+		})
+	}
+
+	if body.Subject == "" {
+		body.Subject = template.Subject
+	}
+	if body.Body == "" {
+		body.Body = template.Body
+	}
+
 	updateTemplateParams := store.UpdateTemplateParams{
 		ID:      templateId,
 		Subject: body.Subject,
 		Body:    body.Body,
 	}
-	template, err := server.store.UpdateTemplate(ctx, updateTemplateParams)
+	template, err = server.store.UpdateTemplate(ctx, updateTemplateParams)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
