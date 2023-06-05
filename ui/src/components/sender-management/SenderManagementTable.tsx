@@ -16,7 +16,7 @@ function SenderManagementTable() {
     senderStore.toggleSelectAll(event.target.checked);
   };
 
-  const handleClick = (_: React.MouseEvent<unknown>, id: number) => {
+  const handleClick = (_: React.MouseEvent, id: number) => {
     senderStore.toggleSelect(id);
   };
 
@@ -87,9 +87,9 @@ function SenderManagementTable() {
           )}
         />
       </Sheet>
-      <div className="p-2 flex justify-end gap-1">
+      <div className="py-4 flex justify-end gap-1">
         <button className="flex gap-2 px-4" onClick={handleDeleteSelected}>
-          <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택삭제
+          <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택 삭제
         </button>
       </div>
     </div>

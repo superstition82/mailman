@@ -4,8 +4,9 @@
 
 ### sender
 
-- /api/sender/
-  - sender 생성, 목록
+- [x] /api/sender/
+  - [x] 생성
+  - [x] 목록
 
 ### recipient
 
@@ -19,9 +20,9 @@
 
 ### template
 
-- /api/templates/
-  - 템플릿 생성, 목록
-- /api/templates/<template_id>/
+- [ ] /api/templates/
+  - [ ] 템플릿 생성, 목록
+- [ ] /api/templates/<template_id>/
   - 템플릿 조회, 수정, 삭제
   - 이미지, 파일 업로드 기능
 

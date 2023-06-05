@@ -43,6 +43,21 @@ const recepientSlice = createSlice({
         recepients: uniqBy([...state.recepients, ...action.payload], "id"),
       };
     },
+    patchRecepient: (state, action: PayloadAction<Partial<Recepient>>) => {
+      return {
+        ...state,
+        recepients: state.recepients.map((recepient) => {
+          if (recepient.id === action.payload.id) {
+            return {
+              ...recepient,
+              ...action.payload,
+            };
+          } else {
+            return recepient;
+          }
+        }),
+      };
+    },
     setIsFetching: (state, action: PayloadAction<boolean>) => {
       return {
         ...state,
@@ -77,6 +92,7 @@ export const {
   createRecepient,
   deleteRecepient,
   deleteBulkRecepient,
+  patchRecepient,
   setIsFetching,
   toggleSelect,
   toggleSelectAll,

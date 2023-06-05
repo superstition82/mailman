@@ -54,6 +54,11 @@ export const useRecepientStore = () => {
       await api.deleteBulkRecepient(recepientIds);
       store.dispatch(reducer.deleteBulkRecepient(recepientIds));
     },
+    validate: async (recepientId: RecepientId) => {
+      const { data } = (await api.validateRecepient(recepientId)).data;
+      store.dispatch(reducer.patchRecepient(data));
+      return data;
+    },
     toggleSelectAll: (checked: boolean) => {
       store.dispatch(reducer.toggleSelectAll(checked));
     },

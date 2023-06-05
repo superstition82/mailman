@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Checkbox, FormLabel, Input, Sheet, Table } from "@mui/joy";
+import { useEffect } from "react";
+import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useRecepientStore } from "../../store/module/recepient";
 import Icon from "../Icon";
@@ -7,7 +7,6 @@ import Icon from "../Icon";
 function RecepientManagementTable() {
   const recepientStore = useRecepientStore();
   const { recepients, selectedIds } = recepientStore.state;
-  const [setting, setSetting] = useState({ waitTime: 2000 });
 
   useEffect(() => {
     recepientStore.fetchRecepients();
@@ -17,19 +16,26 @@ function RecepientManagementTable() {
     recepientStore.toggleSelectAll(event.target.checked);
   };
 
-  const handleClick = (id: number) => {
+  const handleSelect = (id: number) => {
     recepientStore.toggleSelect(id);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSetting((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
   };
 
   const handleDeleteSelected = async () => {
     await recepientStore.deleteBulkRecepient(selectedIds);
+  };
+
+  const handleDeleteUnreachable = async () => {
+    const unreableIds = recepients
+      .filter((recepient) => recepient.reachable == "no")
+      .map((recepient) => recepient.id);
+
+    await recepientStore.deleteBulkRecepient(unreableIds);
+  };
+
+  const handleValidate = async () => {
+    for (const id of selectedIds) {
+      await recepientStore.validate(id);
+    }
   };
 
   return (
@@ -83,7 +89,7 @@ function RecepientManagementTable() {
           )}
           itemContent={(_, recepient) => (
             <>
-              <td onClick={() => handleClick(recepient.id)}>
+              <td onClick={() => handleSelect(recepient.id)}>
                 <Checkbox
                   checked={selectedIds.includes(recepient.id)}
                   sx={{ verticalAlign: "top" }}
@@ -96,21 +102,16 @@ function RecepientManagementTable() {
           )}
         />
       </Sheet>
-      <div className="p-2 flex justify-end gap-1">
+      <div className="py-4 flex justify-end gap-1">
         <>
-          <FormLabel>대기시간(ms)</FormLabel>
-          <Input
-            className="w-20"
-            size="sm"
-            variant="soft"
-            type="number"
-            name="waitTime"
-            value={setting.waitTime}
-            onChange={handleChange}
-            aria-label="초(ms)"
-          />
+          <button className="flex gap-2 px-4" onClick={handleValidate}>
+            <Icon.CheckSquare className="w-6 h-auto opacity-70" /> 선택 검증
+          </button>
           <button className="flex gap-2 px-4" onClick={handleDeleteSelected}>
-            <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택삭제
+            <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택 삭제
+          </button>
+          <button className="flex gap-2 px-4" onClick={handleDeleteUnreachable}>
+            <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 전송불가 삭제
           </button>
         </>
       </div>
