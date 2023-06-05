@@ -1,7 +1,5 @@
 # pocketmail ✉️
 
-<img src="./assets/manage-sender.png" />
-
 ## API Docs
 
 ### sender
