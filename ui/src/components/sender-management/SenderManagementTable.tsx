@@ -20,10 +20,8 @@ function SenderManagementTable() {
     senderStore.toggleSelect(id);
   };
 
-  const handleDeleteSelected = () => {
-    selectedIds.forEach(async (id) => {
-      await senderStore.deleteSenderById(id);
-    });
+  const handleDeleteSelected = async () => {
+    await senderStore.deleteBulkSender(selectedIds);
   };
 
   return (
@@ -35,7 +33,7 @@ function SenderManagementTable() {
         }}
       >
         <TableVirtuoso
-          style={{ height: "65vh" }}
+          style={{ height: "68vh" }}
           data={senders}
           components={{
             Table: (props) => (

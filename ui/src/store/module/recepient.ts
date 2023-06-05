@@ -50,7 +50,10 @@ export const useRecepientStore = () => {
       await api.deleteRecepient(recepientId);
       store.dispatch(deleteRecepient(recepientId));
     },
-
+    deleteBulkRecepient: async (recepientIds: RecepientId[]) => {
+      await api.deleteBulkRecepient(recepientIds);
+      store.dispatch(reducer.deleteBulkRecepient(recepientIds));
+    },
     toggleSelectAll: (checked: boolean) => {
       store.dispatch(reducer.toggleSelectAll(checked));
     },

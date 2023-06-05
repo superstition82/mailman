@@ -17,9 +17,6 @@ export const useSenderStore = () => {
 
   return {
     state,
-    getState: () => {
-      return store.getState().sender;
-    },
     fetchSenders: async (limit = 10, offset = 0) => {
       store.dispatch(setIsFetching(true));
       const senderFind: SenderFind = {
@@ -29,7 +26,6 @@ export const useSenderStore = () => {
       const { data } = (await api.getSenderList(senderFind)).data;
       store.dispatch(upsertSenders(data));
       store.dispatch(setIsFetching(false));
-
       return data;
     },
     fetchSenderById,
@@ -50,7 +46,10 @@ export const useSenderStore = () => {
       await api.deleteSender(senderId);
       store.dispatch(deleteSender(senderId));
     },
-
+    deleteBulkSender: async (senderIds: SenderId[]) => {
+      await api.deleteBulkSender(senderIds);
+      store.dispatch(reducer.deleteBulkSender(senderIds));
+    },
     toggleSelectAll: (checked: boolean) => {
       store.dispatch(reducer.toggleSelectAll(checked));
     },

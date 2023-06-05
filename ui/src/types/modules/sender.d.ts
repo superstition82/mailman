@@ -23,3 +23,7 @@ type SenderFind = {
   offset?: number;
   limit?: number;
 };
+
+type SenderBulkDelete = {
+  senders: number[];
+};

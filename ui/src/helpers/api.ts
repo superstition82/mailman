@@ -27,6 +27,12 @@ export function deleteSender(senderId: SenderId) {
   return axios.delete(`/api/sender/${senderId}`);
 }
 
+export function deleteBulkSender(senderIds: SenderId[]) {
+  return axios.post(`/api/sender/bulk-delete`, {
+    senders: senderIds,
+  });
+}
+
 export function getRecepientList(recepientFind?: RecepientFind) {
   return axios.get<ResponseObject<Recepient[]>>(`/api/recepient`, {
     params: {
@@ -49,6 +55,12 @@ export function createRecepient(recepientCreate: RecepientCreate) {
 
 export function deleteRecepient(recepientId: RecepientId) {
   return axios.delete(`/api/recepient/${recepientId}`);
+}
+
+export function deleteBulkRecepient(recepientIds: RecepientId[]) {
+  return axios.post(`/api/recepient/bulk-delete`, {
+    recepients: recepientIds,
+  });
 }
 
 export function validateRecepient(recepientId: RecepientId) {

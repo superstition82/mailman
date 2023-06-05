@@ -18,3 +18,7 @@ type RecepientFind = {
   offset?: number;
   limit?: number;
 };
+
+type RecepeintBulkDelete = {
+  recepients: number[];
+};

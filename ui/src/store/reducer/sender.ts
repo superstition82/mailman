@@ -29,6 +29,14 @@ const senderSlice = createSlice({
         }),
       };
     },
+    deleteBulkSender: (state, action: PayloadAction<SenderId[]>) => {
+      return {
+        ...state,
+        recepients: state.senders.filter((sender) => {
+          return !action.payload.includes(sender.id);
+        }),
+      };
+    },
     upsertSenders: (state, action: PayloadAction<Sender[]>) => {
       return {
         ...state,
@@ -68,6 +76,7 @@ const senderSlice = createSlice({
 export const {
   createSender,
   deleteSender,
+  deleteBulkSender,
   upsertSenders,
   setIsFetching,
   toggleSelect,

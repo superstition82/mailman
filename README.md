@@ -1,4 +1,4 @@
-# mails ✉️
+# mails
 
 ## API Docs
 

@@ -24,8 +24,16 @@ const recepientSlice = createSlice({
     deleteRecepient: (state, action: PayloadAction<RecepientId>) => {
       return {
         ...state,
-        recepients: state.recepients.filter((sender) => {
-          return sender.id !== action.payload;
+        recepients: state.recepients.filter((recepient) => {
+          return recepient.id !== action.payload;
+        }),
+      };
+    },
+    deleteBulkRecepient: (state, action: PayloadAction<RecepientId[]>) => {
+      return {
+        ...state,
+        recepients: state.recepients.filter((recepient) => {
+          return !action.payload.includes(recepient.id);
         }),
       };
     },
@@ -45,7 +53,7 @@ const recepientSlice = createSlice({
       return {
         ...state,
         selectedIds: action.payload
-          ? state.recepients.map((sender) => sender.id)
+          ? state.recepients.map((recepient) => recepient.id)
           : [],
       };
     },
@@ -68,6 +76,7 @@ const recepientSlice = createSlice({
 export const {
   createRecepient,
   deleteRecepient,
+  deleteBulkRecepient,
   setIsFetching,
   toggleSelect,
   toggleSelectAll,

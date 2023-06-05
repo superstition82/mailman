@@ -28,6 +28,10 @@ function RecepientManagementTable() {
     }));
   };
 
+  const handleDeleteSelected = async () => {
+    await recepientStore.deleteBulkRecepient(selectedIds);
+  };
+
   return (
     <div className="flex flex-col rounded-sm px-2 mb-8 bg-white ">
       <Sheet
@@ -105,12 +109,7 @@ function RecepientManagementTable() {
             onChange={handleChange}
             aria-label="초(ms)"
           />
-          <button
-            className="flex gap-2 px-4"
-            onClick={() => {
-              console.log("hello");
-            }}
-          >
+          <button className="flex gap-2 px-4" onClick={handleDeleteSelected}>
             <Icon.MinusSquare className="w-6 h-auto opacity-70" /> 선택삭제
           </button>
         </>
