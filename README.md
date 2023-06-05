@@ -1,15 +1,3 @@
-## 클라이언트 화면
-
-## SMTP TEST
-
-```
-http POST localhost:8081/api/smtp \
-  host="smtp.naver.com" \
-  port="587" \
-  email="chotnt741@gmail.com" \
-  password="cert0188*"
-```
-
 ## API Docs
 
 ### sender
