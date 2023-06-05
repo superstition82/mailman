@@ -14,10 +14,6 @@ type createRecepientRequestBody struct {
 	Email string `json:"email"`
 }
 
-type createRecepientOKResponse struct {
-	RecepientID int `json:"recepient_id"`
-}
-
 func (server *Server) createRecepient(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -39,8 +35,8 @@ func (server *Server) createRecepient(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, &createRecepientOKResponse{
-		RecepientID: recepient.ID,
+	return c.JSON(http.StatusOK, &okResponse{
+		Data: recepient,
 	})
 }
 
@@ -85,7 +81,9 @@ func (server *Server) getRecepient(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, recepient)
+	return c.JSON(http.StatusOK, &okResponse{
+		Data: recepient,
+	})
 }
 
 func (server *Server) deleteRecepient(c echo.Context) error {
@@ -146,5 +144,7 @@ func (server *Server) validateRecepient(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, updatedRecepient)
+	return c.JSON(http.StatusOK, &okResponse{
+		Data: updatedRecepient,
+	})
 }

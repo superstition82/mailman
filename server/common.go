@@ -7,6 +7,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type okResponse struct {
+	Data interface{} `json:"data"`
+}
+
 type errorResponse struct {
 	Message string `json:"message"`
 }

@@ -18,10 +18,6 @@ type createSenderRequestBody struct {
 	Password string `json:"password"`
 }
 
-type createSenderOKResponse struct {
-	SenderID int `json:"sender_id"`
-}
-
 func (server *Server) createSender(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -53,8 +49,8 @@ func (server *Server) createSender(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, &createSenderOKResponse{
-		SenderID: sender.ID,
+	return c.JSON(http.StatusOK, &okResponse{
+		Data: sender,
 	})
 }
 
@@ -80,10 +76,6 @@ func smtpLoginTest(host string, port int, email string, password string) error {
 	return nil
 }
 
-type listSenderOKResponse struct {
-	Data []store.Sender `json:"data"`
-}
-
 func (server *Server) listSenders(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -105,7 +97,7 @@ func (server *Server) listSenders(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, &listSenderOKResponse{
+	return c.JSON(http.StatusOK, &okResponse{
 		Data: result,
 	})
 }
@@ -124,7 +116,9 @@ func (server *Server) getSender(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, sender)
+	return c.JSON(http.StatusOK, &okResponse{
+		Data: sender,
+	})
 }
 
 func (server *Server) deleteSender(c echo.Context) error {
