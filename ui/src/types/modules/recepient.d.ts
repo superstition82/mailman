@@ -1,7 +1,7 @@
-type RecepientId = number;
+type RecipientId = number;
 
-type Recepient = {
-  id: RecepientId;
+type Recipient = {
+  id: RecipientId;
 
   createdTs: TimeStamp;
   updatedTs: TimeStamp;
@@ -10,15 +10,15 @@ type Recepient = {
   reachable: string;
 };
 
-type RecepientCreate = {
+type RecipientCreate = {
   email: string;
 };
 
-type RecepientFind = {
+type RecipientFind = {
   offset?: number;
   limit?: number;
 };
 
 type RecepeintBulkDelete = {
-  recepients: number[];
+  recipients: number[];
 };

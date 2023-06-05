@@ -67,7 +67,7 @@ function Header() {
               </>
             </NavLink>
             <NavLink
-              to="/manage/recepient"
+              to="/manage/recipient"
               id="header-review"
               className={({ isActive }) =>
                 `${

@@ -59,22 +59,28 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 
 	apiGroup := e.Group("/api")
 
-	// recepient api
-	recepientGroup := apiGroup.Group("/recepient")
-	recepientGroup.POST("", s.createRecepient)
-	recepientGroup.GET("", s.listRecepients)
-	recepientGroup.GET("/:recepientId", s.getRecepient)
-	recepientGroup.DELETE("/:recepientId", s.deleteRecepient)
-	recepientGroup.POST("/bulk-delete", s.deleteBulkRecepient)
-	recepientGroup.POST("/:recepientId/verification", s.validateRecepient)
+	// recipient endpoint
+	recipientGroup := apiGroup.Group("/recipient")
+	recipientGroup.POST("", s.createRecipient)
+	recipientGroup.POST("/file-import", s.importRecipientsByFile)
+	recipientGroup.GET("", s.listAllRecipients)
+	recipientGroup.GET("/:recipientId", s.getRecipient)
+	recipientGroup.DELETE("/:recipientId", s.deleteRecipient)
+	recipientGroup.POST("/bulk-delete", s.deleteBulkRecipient)
+	recipientGroup.POST("/:recipientId/verification", s.validateRecipient)
 
-	// sender api
+	// sender endpoint
 	senderGroup := apiGroup.Group("/sender")
 	senderGroup.POST("", s.createSender)
-	senderGroup.GET("", s.listSenders)
+	senderGroup.GET("", s.listAllSenders)
 	senderGroup.GET("/:senderId", s.getSender)
 	senderGroup.DELETE("/:senderId", s.deleteSender)
 	senderGroup.POST("/bulk-delete", s.deleteBulkSender)
+
+	// template endpoint
+	templateGroup := apiGroup.Group("/template")
+	templateGroup.POST("", s.createTemplate)
+	recipientGroup.GET("", s.listAllRecipients)
 
 	return s, nil
 }

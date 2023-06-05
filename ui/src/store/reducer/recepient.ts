@@ -2,58 +2,58 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { uniqBy } from "lodash-es";
 
 type State = {
-  recepients: Recepient[];
-  selectedIds: RecepientId[];
+  recipients: Recipient[];
+  selectedIds: RecipientId[];
   isFetching: boolean;
 };
 
-const recepientSlice = createSlice({
-  name: "recepient",
+const recipientSlice = createSlice({
+  name: "recipient",
   initialState: {
-    recepients: [],
+    recipients: [],
     selectedIds: [],
     isFetching: true,
   } as State,
   reducers: {
-    createRecepient: (state, action: PayloadAction<Recepient>) => {
+    createRecipient: (state, action: PayloadAction<Recipient>) => {
       return {
         ...state,
-        recepients: state.recepients.concat(action.payload),
+        recipients: state.recipients.concat(action.payload),
       };
     },
-    deleteRecepient: (state, action: PayloadAction<RecepientId>) => {
+    deleteRecipient: (state, action: PayloadAction<RecipientId>) => {
       return {
         ...state,
-        recepients: state.recepients.filter((recepient) => {
-          return recepient.id !== action.payload;
+        recipients: state.recipients.filter((recipient) => {
+          return recipient.id !== action.payload;
         }),
       };
     },
-    deleteBulkRecepient: (state, action: PayloadAction<RecepientId[]>) => {
+    deleteBulkRecipient: (state, action: PayloadAction<RecipientId[]>) => {
       return {
         ...state,
-        recepients: state.recepients.filter((recepient) => {
-          return !action.payload.includes(recepient.id);
+        recipients: state.recipients.filter((recipient) => {
+          return !action.payload.includes(recipient.id);
         }),
       };
     },
-    upsertRecepients: (state, action: PayloadAction<Recepient[]>) => {
+    upsertRecipients: (state, action: PayloadAction<Recipient[]>) => {
       return {
         ...state,
-        recepients: uniqBy([...state.recepients, ...action.payload], "id"),
+        recipients: uniqBy([...state.recipients, ...action.payload], "id"),
       };
     },
-    patchRecepient: (state, action: PayloadAction<Partial<Recepient>>) => {
+    patchRecipient: (state, action: PayloadAction<Partial<Recipient>>) => {
       return {
         ...state,
-        recepients: state.recepients.map((recepient) => {
-          if (recepient.id === action.payload.id) {
+        recipients: state.recipients.map((recipient) => {
+          if (recipient.id === action.payload.id) {
             return {
-              ...recepient,
+              ...recipient,
               ...action.payload,
             };
           } else {
-            return recepient;
+            return recipient;
           }
         }),
       };
@@ -68,7 +68,7 @@ const recepientSlice = createSlice({
       return {
         ...state,
         selectedIds: action.payload
-          ? state.recepients.map((recepient) => recepient.id)
+          ? state.recipients.map((recipient) => recipient.id)
           : [],
       };
     },
@@ -89,14 +89,14 @@ const recepientSlice = createSlice({
 });
 
 export const {
-  createRecepient,
-  deleteRecepient,
-  deleteBulkRecepient,
-  patchRecepient,
+  createRecipient,
+  deleteRecipient,
+  deleteBulkRecipient,
+  patchRecipient,
   setIsFetching,
   toggleSelect,
   toggleSelectAll,
-  upsertRecepients,
-} = recepientSlice.actions;
+  upsertRecipients,
+} = recipientSlice.actions;
 
-export default recepientSlice.reducer;
+export default recipientSlice.reducer;

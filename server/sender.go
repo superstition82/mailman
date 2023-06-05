@@ -76,21 +76,10 @@ func smtpLoginTest(host string, port int, email string, password string) error {
 	return nil
 }
 
-func (server *Server) listSenders(c echo.Context) error {
+func (server *Server) listAllSenders(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	var listSenderParams store.ListSendersParams
-	limit, err := strconv.Atoi(c.QueryParam("limit"))
-	if err == nil {
-		listSenderParams.Limit = limit
-	}
-
-	offset, err := strconv.Atoi(c.QueryParam("offset"))
-	if err == nil {
-		listSenderParams.Offset = offset
-	}
-
-	result, err := server.store.ListSenders(ctx, listSenderParams)
+	result, err := server.store.ListAllSenders(ctx)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),

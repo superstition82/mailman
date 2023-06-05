@@ -14,7 +14,7 @@ CREATE TABLE user (
   password_hash TEXT NOT NULL
 );
 
-CREATE TABLE recepient (
+CREATE TABLE recipient (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
@@ -45,5 +45,5 @@ CREATE TABLE template_file (
   template_id INTEGER NOT NULL,
   path TEXT NOT NULL,
   filesize INTEGER NOT NULL,
-  FOREIGN KEY (template_id) REFRENCES template(id)
+  FOREIGN KEY (template_id) REFERENCES template(id)
 )

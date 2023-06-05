@@ -1,45 +1,69 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
-import { useRecepientStore } from "../../store/module/recepient";
+import { useRecipientStore } from "../../store/module/recipient";
 import Icon from "../Icon";
+import LoadingWithProgress from "../LoadingWithProgress";
 
-function RecepientManagementTable() {
-  const recepientStore = useRecepientStore();
-  const { recepients, selectedIds } = recepientStore.state;
+function RecipientManagementTable() {
+  const recipientStore = useRecipientStore();
+  const { recipients, selectedIds } = recipientStore.state;
+  const [validateProgress, setValidateProgress] = useState({
+    isLoading: false,
+    current: 0,
+    total: 0,
+  });
 
   useEffect(() => {
-    recepientStore.fetchRecepients();
+    recipientStore.fetchRecipients();
   }, []);
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
-    recepientStore.toggleSelectAll(event.target.checked);
+    recipientStore.toggleSelectAll(event.target.checked);
   };
 
   const handleSelect = (id: number) => {
-    recepientStore.toggleSelect(id);
+    recipientStore.toggleSelect(id);
   };
 
   const handleDeleteSelected = async () => {
-    await recepientStore.deleteBulkRecepient(selectedIds);
+    await recipientStore.deleteBulkRecipient(selectedIds);
   };
 
   const handleDeleteUnreachable = async () => {
-    const unreableIds = recepients
-      .filter((recepient) => recepient.reachable == "no")
-      .map((recepient) => recepient.id);
+    const unreableIds = recipients
+      .filter((recipient) => recipient.reachable == "no")
+      .map((recipient) => recipient.id);
 
-    await recepientStore.deleteBulkRecepient(unreableIds);
+    await recipientStore.deleteBulkRecipient(unreableIds);
   };
 
-  const handleValidate = async () => {
+  const handleValidate = useCallback(async () => {
+    setValidateProgress(() => ({
+      current: 0,
+      total: selectedIds.length,
+      isLoading: true,
+    }));
     for (const id of selectedIds) {
-      await recepientStore.validate(id);
+      setValidateProgress((prev) => ({
+        ...prev,
+        current: prev.current + 1,
+      }));
+      await recipientStore.validate(id);
     }
-  };
+    setValidateProgress((prev) => ({
+      ...prev,
+      isLoading: false,
+    }));
+  }, [recipientStore, selectedIds, setValidateProgress]);
+
+  if (validateProgress.isLoading) {
+    const { current, total } = validateProgress;
+    return <LoadingWithProgress current={current} total={total} />;
+  }
 
   return (
-    <div className="flex flex-col rounded-sm px-2 mb-8 bg-white ">
+    <div className="flex flex-col rounded-sm px-2 mb-8 bg-white">
       <Sheet
         sx={{
           "--TableCell-height": "40px",
@@ -48,7 +72,7 @@ function RecepientManagementTable() {
       >
         <TableVirtuoso
           style={{ height: "75vh" }}
-          data={recepients}
+          data={recipients}
           components={{
             Table: (props) => (
               <Table
@@ -72,11 +96,11 @@ function RecepientManagementTable() {
                 <Checkbox
                   indeterminate={
                     selectedIds.length > 0 &&
-                    selectedIds.length < recepients.length
+                    selectedIds.length < recipients.length
                   }
                   checked={
-                    recepients.length > 0 &&
-                    selectedIds.length === recepients.length
+                    recipients.length > 0 &&
+                    selectedIds.length === recipients.length
                   }
                   onChange={handleSelectAll}
                   sx={{ verticalAlign: "sub" }}
@@ -87,17 +111,17 @@ function RecepientManagementTable() {
               <th>전송가능</th>
             </tr>
           )}
-          itemContent={(_, recepient) => (
+          itemContent={(_, recipient) => (
             <>
-              <td onClick={() => handleSelect(recepient.id)}>
+              <td onClick={() => handleSelect(recipient.id)}>
                 <Checkbox
-                  checked={selectedIds.includes(recepient.id)}
+                  checked={selectedIds.includes(recipient.id)}
                   sx={{ verticalAlign: "top" }}
                 />
               </td>
-              <td>{recepient.id}</td>
-              <td>{recepient.email}</td>
-              <td>{recepient.reachable}</td>
+              <td>{recipient.id}</td>
+              <td>{recipient.email}</td>
+              <td>{recipient.reachable}</td>
             </>
           )}
         />
@@ -119,4 +143,4 @@ function RecepientManagementTable() {
   );
 }
 
-export default RecepientManagementTable;
+export default RecipientManagementTable;

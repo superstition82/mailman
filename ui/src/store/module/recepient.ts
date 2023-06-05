@@ -1,71 +1,71 @@
 import * as api from "../../helpers/api";
 import store, { useAppSelector } from "../";
-import * as reducer from "../reducer/recepient";
+import * as reducer from "../reducer/recipient";
 import {
-  createRecepient,
-  deleteRecepient,
+  createRecipient,
+  deleteRecipient,
   setIsFetching,
-  upsertRecepients,
-} from "../reducer/recepient";
+  upsertRecipients,
+} from "../reducer/recipient";
 
-export const useRecepientStore = () => {
-  const state = useAppSelector((state) => state.recepient);
-  const fetchRecepientById = async (recepientId: RecepientId) => {
-    const { data } = (await api.getRecepientById(recepientId)).data;
+export const useRecipientStore = () => {
+  const state = useAppSelector((state) => state.recipient);
+  const fetchRecipientById = async (recipientId: RecipientId) => {
+    const { data } = (await api.getRecipientById(recipientId)).data;
     return data;
   };
 
   return {
     state,
     getState: () => {
-      return store.getState().recepient;
+      return store.getState().recipient;
     },
-    fetchRecepients: async (limit = 10, offset = 0) => {
+    fetchRecipients: async (limit = 10, offset = 0) => {
       store.dispatch(setIsFetching(true));
-      const recepientFind: RecepientFind = {
+      const recipientFind: RecipientFind = {
         limit,
         offset,
       };
-      const { data } = (await api.getRecepientList(recepientFind)).data;
-      store.dispatch(upsertRecepients(data));
+      const { data } = (await api.getRecipientList(recipientFind)).data;
+      store.dispatch(upsertRecipients(data));
       store.dispatch(setIsFetching(false));
 
       return data;
     },
-    fetchRecepientById,
-    getRecepientById: async (recepientId: RecepientId) => {
-      for (const s of state.recepients) {
-        if (s.id === recepientId) {
+    fetchRecipientById,
+    getRecipientById: async (recipientId: RecipientId) => {
+      for (const s of state.recipients) {
+        if (s.id === recipientId) {
           return s;
         }
       }
-      return await fetchRecepientById(recepientId);
+      return await fetchRecipientById(recipientId);
     },
-    createRecepient: async (recepientCreate: RecepientCreate) => {
-      const { data } = (await api.createRecepient(recepientCreate)).data;
-      store.dispatch(createRecepient(data));
+    createRecipient: async (recipientCreate: RecipientCreate) => {
+      const { data } = (await api.createRecipient(recipientCreate)).data;
+      store.dispatch(createRecipient(data));
       return data;
     },
-    deleteRecepientById: async (recepientId: RecepientId) => {
-      await api.deleteRecepient(recepientId);
-      store.dispatch(deleteRecepient(recepientId));
+    deleteRecipientById: async (recipientId: RecipientId) => {
+      await api.deleteRecipient(recipientId);
+      store.dispatch(deleteRecipient(recipientId));
     },
-    deleteBulkRecepient: async (recepientIds: RecepientId[]) => {
-      await api.deleteBulkRecepient(recepientIds);
-      store.dispatch(reducer.deleteBulkRecepient(recepientIds));
+    deleteBulkRecipient: async (recipientIds: RecipientId[]) => {
+      await api.deleteBulkRecipient(recipientIds);
+      store.dispatch(reducer.deleteBulkRecipient(recipientIds));
     },
-    validate: async (recepientId: RecepientId) => {
-      const { data } = (await api.validateRecepient(recepientId)).data;
-      store.dispatch(reducer.patchRecepient(data));
+    validate: async (recipientId: RecipientId) => {
+      const { data } = (await api.validateRecipient(recipientId)).data;
+      store.dispatch(reducer.patchRecipient(data));
       return data;
     },
     toggleSelectAll: (checked: boolean) => {
       store.dispatch(reducer.toggleSelectAll(checked));
     },
-    toggleSelect: (id: RecepientId) => {
+    toggleSelect: (id: RecipientId) => {
       store.dispatch(reducer.toggleSelect(id));
     },
-    isSelected: (id: RecepientId) => {
+    isSelected: (id: RecipientId) => {
       return state.selectedIds.includes(id);
     },
   };

@@ -4,7 +4,7 @@ import { lazy } from "react";
 const Root = lazy(() => import("../layouts/Root"));
 const Home = lazy(() => import("../pages/Home"));
 const SenderManagement = lazy(() => import("../pages/SenderManagement"));
-const RecepientManagement = lazy(() => import("../pages/RecepientManagement"));
+const RecipientManagement = lazy(() => import("../pages/RecipientManagement"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 export const router = createBrowserRouter([
@@ -21,8 +21,8 @@ export const router = createBrowserRouter([
         element: <SenderManagement />,
       },
       {
-        path: "/manage/recepient",
-        element: <RecepientManagement />,
+        path: "/manage/recipient",
+        element: <RecipientManagement />,
       },
     ],
   },

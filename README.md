@@ -13,9 +13,9 @@
 - [x] /api/recipients/
   - [x] 생성
   - [x] 목록
-- [ ] /api/recepient/file-import
+- [ ] /api/recipient/file-import
   - [ ] 파일 읽어서 추가
-- [ ] /api/recepient/file-export
+- [ ] /api/recipient/file-export
   - [ ] 검증된 수신자를 파일 형태로 추출
 - [x] /api/recipients/<recipient_id>/
   - 수신자 조회, 삭제
@@ -42,3 +42,5 @@
   - 따라서 cid 방법을 이용해야하는데, 저장되는 본문과는 다르게 수정을 거쳐 메일을 전송해야 함.
     - regex를 사용하면 일반적인 경우에서는 해결할 수 있었음.
     - 더 좋은 방법이 있는지는 정말 고민되는 부분. 다른 구현체를 찾을 수 있으면 좋겠다.
+- 사용자 데이터가 많지 않을 거라고 가정하고 스크롤 기반 페이지네이션은 구현하지 않았다.
+  - 대신 테이블 가상화 기술로 렌더링 문제를 해결하였다.

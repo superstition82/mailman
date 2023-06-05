@@ -33,38 +33,38 @@ export function deleteBulkSender(senderIds: SenderId[]) {
   });
 }
 
-export function getRecepientList(recepientFind?: RecepientFind) {
-  return axios.get<ResponseObject<Recepient[]>>(`/api/recepient`, {
+export function getRecipientList(recipientFind?: RecipientFind) {
+  return axios.get<ResponseObject<Recipient[]>>(`/api/recipient`, {
     params: {
-      offset: recepientFind?.offset,
-      limit: recepientFind?.limit,
+      offset: recipientFind?.offset,
+      limit: recipientFind?.limit,
     },
   });
 }
 
-export function getRecepientById(recepientId: RecepientId) {
-  return axios.get<ResponseObject<Recepient>>(`/api/recepient/${recepientId}`);
+export function getRecipientById(recipientId: RecipientId) {
+  return axios.get<ResponseObject<Recipient>>(`/api/recipient/${recipientId}`);
 }
 
-export function createRecepient(recepientCreate: RecepientCreate) {
-  return axios.post<ResponseObject<Recepient>>(
-    `/api/recepient`,
-    recepientCreate
+export function createRecipient(recipientCreate: RecipientCreate) {
+  return axios.post<ResponseObject<Recipient>>(
+    `/api/recipient`,
+    recipientCreate
   );
 }
 
-export function deleteRecepient(recepientId: RecepientId) {
-  return axios.delete(`/api/recepient/${recepientId}`);
+export function deleteRecipient(recipientId: RecipientId) {
+  return axios.delete(`/api/recipient/${recipientId}`);
 }
 
-export function deleteBulkRecepient(recepientIds: RecepientId[]) {
-  return axios.post(`/api/recepient/bulk-delete`, {
-    recepients: recepientIds,
+export function deleteBulkRecipient(recipientIds: RecipientId[]) {
+  return axios.post(`/api/recipient/bulk-delete`, {
+    recipients: recipientIds,
   });
 }
 
-export function validateRecepient(recepientId: RecepientId) {
-  return axios.post<ResponseObject<Recepient>>(
-    `/api/recepient/${recepientId}/verification`
+export function validateRecipient(recipientId: RecipientId) {
+  return axios.post<ResponseObject<Recipient>>(
+    `/api/recipient/${recipientId}/verification`
   );
 }

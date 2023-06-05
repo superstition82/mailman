@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react";
-import { useRecepientStore } from "../../store/module/recepient";
+import { useRecipientStore } from "../../store/module/recipient";
 import Icon from "../Icon";
 
-function RecepientManagementForm() {
-  const recepientStore = useRecepientStore();
-  const { recepients } = recepientStore.state;
+function RecipientManagementForm() {
+  const recipientStore = useRecipientStore();
+  const { recipients } = recipientStore.state;
   const [form, setForm] = useState({ email: "" });
 
   const handleChangeForm = useCallback(
@@ -20,7 +20,7 @@ function RecepientManagementForm() {
   const handleSubmitForm = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      await recepientStore.createRecepient({
+      await recipientStore.createRecipient({
         email: form.email,
       });
       setForm({ email: "" });
@@ -32,7 +32,7 @@ function RecepientManagementForm() {
     <form className="flex flex-wrap mb-4" onSubmit={handleSubmitForm}>
       <div className="w-full flex items-center">
         <h2 className="text-xl text-gray-700 font-bold">
-          수신자 관리 ({recepients.length}개)
+          수신자 관리 ({recipients.length}개)
         </h2>
       </div>
       <div className="w-full flex mt-4 bg-white rounded-sm">
@@ -52,4 +52,4 @@ function RecepientManagementForm() {
   );
 }
 
-export default RecepientManagementForm;
+export default RecipientManagementForm;

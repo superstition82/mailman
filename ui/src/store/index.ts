@@ -2,13 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import layoutReducer from "./reducer/layout";
 import senderReducer from "./reducer/sender";
-import recepientReducer from "./reducer/recepient";
+import recipientReducer from "./reducer/recipient";
 
 const store = configureStore({
   reducer: {
     layout: layoutReducer,
     sender: senderReducer,
-    recepient: recepientReducer,
+    recipient: recipientReducer,
   },
 });
 

@@ -32,7 +32,7 @@ const senderSlice = createSlice({
     deleteBulkSender: (state, action: PayloadAction<SenderId[]>) => {
       return {
         ...state,
-        recepients: state.senders.filter((sender) => {
+        recipients: state.senders.filter((sender) => {
           return !action.payload.includes(sender.id);
         }),
       };
