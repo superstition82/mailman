@@ -99,6 +99,7 @@ func (server *Server) updateTemplate(c echo.Context) error {
 		})
 	}
 
+	//TODO: better way to solve this?
 	if body.Subject == "" {
 		body.Subject = template.Subject
 	}
