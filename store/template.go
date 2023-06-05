@@ -32,6 +32,19 @@ func (s *Store) CreateTemplate(ctx context.Context, arg CreateTemplateParams) (T
 	return template, err
 }
 
+const getTemplate = `
+	SELECT id, subject, body, created_ts, updated_ts
+	FROM template
+	WHERE id = $1 LIMIT 1
+`
+
+func (s *Store) GetTemplate(ctx context.Context, id int) (Template, error) {
+	row := s.db.QueryRowContext(ctx, getTemplate, id)
+	var template Template
+	err := row.Scan(&template.ID, &template.Subject, &template.Body, &template.CreatedTs, &template.UpdatedTs)
+	return template, err
+}
+
 const listAllTemplates = `
 	SELECT id, subject, body, created_ts, updated_ts
 	FROM template

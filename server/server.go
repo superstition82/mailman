@@ -80,7 +80,10 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	// template endpoint
 	templateGroup := apiGroup.Group("/template")
 	templateGroup.POST("", s.createTemplate)
-	recipientGroup.GET("", s.listAllRecipients)
+	templateGroup.GET("", s.listAllTemplates)
+	templateGroup.GET("/:templateId", s.getTemplate)
+	templateGroup.PATCH("/:templateId", s.updateTemplate)
+	templateGroup.DELETE("/:templateId", s.deleteTemplate)
 
 	return s, nil
 }
