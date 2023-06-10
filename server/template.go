@@ -141,3 +141,26 @@ func (server *Server) deleteTemplate(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, true)
 }
+
+type deleteBulkTemplateRequestBody struct {
+	Templates []int `json:"templates"`
+}
+
+func (server *Server) deleteBulkTemplate(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var body deleteBulkTemplateRequestBody
+	if err := c.Bind(&body); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: "bad request",
+		})
+	}
+
+	if err := server.store.DeleteBulkTemplate(ctx, body.Templates); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: "bad request",
+		})
+	}
+
+	return c.JSON(http.StatusOK, true)
+}

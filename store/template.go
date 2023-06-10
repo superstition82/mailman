@@ -1,6 +1,9 @@
 package store
 
-import "context"
+import (
+	"context"
+	"database/sql"
+)
 
 type Template struct {
 	ID int `json:"id"`
@@ -109,4 +112,26 @@ const deleteTemplate = `
 func (s *Store) DeleteTemplate(ctx context.Context, id int) error {
 	_, err := s.db.ExecContext(ctx, deleteTemplate, id)
 	return err
+}
+
+func (s *Store) DeleteBulkTemplate(ctx context.Context, ids []int) error {
+	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return err
+	}
+
+	for _, id := range ids {
+		_, err = tx.Exec(deleteTemplate, id)
+		if err != nil {
+			tx.Rollback()
+			return nil
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil
+	}
+
+	return nil
 }

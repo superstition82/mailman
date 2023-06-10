@@ -85,6 +85,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	templateGroup.GET("/:templateId", s.getTemplate)
 	templateGroup.PATCH("/:templateId", s.updateTemplate)
 	templateGroup.DELETE("/:templateId", s.deleteTemplate)
+	templateGroup.POST("/bulk-delete", s.deleteBulkTemplate)
 
 	return s, nil
 }
