@@ -43,6 +43,10 @@ export const useTemplateStore = () => {
       await api.deleteSender(id);
       store.dispatch(deleteTemplate(id));
     },
+    deleteBulkTemplate: async (templateIds: TemplateId[]) => {
+      await api.deleteBulkSender(templateIds);
+      store.dispatch(reducer.deleteBulkTemplate(templateIds));
+    },
     toggleSelectAll: (checked: boolean) => {
       store.dispatch(reducer.toggleSelectAll(checked));
     },

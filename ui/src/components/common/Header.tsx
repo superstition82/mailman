@@ -93,6 +93,14 @@ function Header() {
                 <Icon.Paperclip className="mr-3 w-6 h-auto opacity-70" /> 리소스
               </>
             </NavLink>
+            <div className="pr-3 pl-1 w-full">
+              <button
+                className="mt-2 w-full py-3 rounded-full flex flex-row justify-center items-center bg-green-600 font-medium text-white dark:opacity-80 hover:shadow hover:opacity-90"
+                onClick={() => console.log("hi")}
+              >
+                <Icon.Edit3 className="w-4 h-auto mr-1" /> New
+              </button>
+            </div>
           </>
         </div>
       </header>

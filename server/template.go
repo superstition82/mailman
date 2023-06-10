@@ -103,6 +103,7 @@ func (server *Server) updateTemplate(c echo.Context) error {
 	if body.Subject == "" {
 		body.Subject = template.Subject
 	}
+
 	if body.Body == "" {
 		body.Body = template.Body
 	}
