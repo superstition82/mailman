@@ -168,10 +168,15 @@ func (server *Server) downloadResource(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("resourceId"))).SetInternal(err)
 	}
+	filename, err := url.QueryUnescape(c.Param("filename"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("filename is invalid: %s", c.Param("filename"))).SetInternal(err)
+	}
 
 	resource, err := server.store.FindResource(ctx, &store.ResourceFind{
-		ID:      &resourceID,
-		GetBlob: true,
+		ID:       &resourceID,
+		Filename: &filename,
+		GetBlob:  true,
 	})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to find resource by ID: %v", resourceID)).SetInternal(err)
