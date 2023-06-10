@@ -64,6 +64,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	recipientGroup := apiGroup.Group("/recipient")
 	recipientGroup.POST("", s.createRecipient)
 	recipientGroup.POST("/file-import", s.importRecipientsByFile)
+	recipientGroup.GET("/file-export", s.exportRecipientsToFile)
 	recipientGroup.GET("", s.findRecipientList)
 	recipientGroup.GET("/:recipientId", s.findRecipient)
 	recipientGroup.DELETE("/:recipientId", s.deleteRecipient)

@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"mails/store"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 
 	emailverifier "github.com/AfterShip/email-verifier"
 	"github.com/labstack/echo/v4"
@@ -128,13 +130,11 @@ var (
 
 func (server *Server) validateRecipient(c echo.Context) error {
 	ctx := c.Request().Context()
-	fmt.Println("=== verify recipient ===")
 
 	recipientID, err := strconv.Atoi(c.Param("recipientId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("recipientId")))
 	}
-
 	recipient, err := server.store.FindRecipient(ctx, &store.RecipientFind{
 		ID: &recipientID,
 	})
@@ -153,15 +153,11 @@ func (server *Server) validateRecipient(c echo.Context) error {
 				Message: "failed to verify",
 			})
 		}
-		fmt.Println("verify recipient success")
-
 		updatedRecipient, err = server.store.PatchRecipient(ctx, &store.RecipientPatch{
 			ID:        recipient.ID,
 			Email:     &recipient.Email,
 			Reachable: &verifiedResult.Reachable,
 		})
-		fmt.Println("update recipient success")
-
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, &errorResponse{
 				Message: err.Error(),
@@ -218,4 +214,39 @@ func (server *Server) importRecipientsByFile(c echo.Context) error {
 	return c.JSON(http.StatusOK, &okResponse{
 		Data: recipients,
 	})
+}
+
+func (server *Server) exportRecipientsToFile(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	recipients, err := server.store.FindRecipientList(ctx, &store.RecipientFind{})
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: err.Error(),
+		})
+	}
+
+	file, err := os.CreateTemp("", "recipients.txt")
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to generate a file")
+	}
+	defer os.Remove(file.Name()) // Remove the temporary file when done
+
+	var emails []string
+	for _, recipient := range recipients {
+		emails = append(emails, recipient.Email)
+	}
+
+	content := strings.Join(emails, "\n")
+	_, err = file.Write([]byte(content))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: err.Error(),
+		})
+	}
+
+	c.Response().Header().Set("Content-Disposition", "attachment; filename=customers.txt")
+	c.Response().Header().Set("Content-Type", "text/plain")
+
+	return c.File(file.Name())
 }
