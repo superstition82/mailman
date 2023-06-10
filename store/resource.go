@@ -113,29 +113,6 @@ func (s *Store) PatchResource(ctx context.Context, patch ResourcePatch) (*Resour
 	return &resource, nil
 }
 
-func (s *Store) FindResource(ctx context.Context, id int) (*Resource, error) {
-	fields := []string{"id", "filename", "type", "size", "created_ts", "updated_ts", "internal_path", "external_link"}
-	query := fmt.Sprintf(`
-	SELECT %s FROM resource
-	WHERE resource.id = %d
-`, strings.Join(fields, ", "), id)
-
-	row := s.db.QueryRowContext(ctx, query, id)
-	var resource Resource
-	err := row.Scan(
-		&resource.ID,
-		&resource.Filename,
-		&resource.Type,
-		&resource.Size,
-		&resource.CreatedTs,
-		&resource.UpdatedTs,
-		&resource.InternalPath,
-		&resource.ExternalLink,
-	)
-
-	return &resource, err
-}
-
 type ResourceFind struct {
 	ID *int `json:"id"`
 
@@ -151,7 +128,6 @@ type ResourceFind struct {
 
 func (s *Store) FindResourceList(ctx context.Context, find *ResourceFind) ([]*Resource, error) {
 	where, args := []string{"1 = 1"}, []any{}
-	fields := []string{"resource.id", "resource.filename", "resource.type", "resource.size", "resource.created_ts", "resource.updated_ts", "internal_path", "external_link"}
 
 	if v := find.ID; v != nil {
 		where, args = append(where, "resource.id = ?"), append(args, *v)
@@ -161,6 +137,11 @@ func (s *Store) FindResourceList(ctx context.Context, find *ResourceFind) ([]*Re
 	}
 	if v := find.MemoID; v != nil {
 		where, args = append(where, "resource.id in (SELECT resource_id FROM memo_resource WHERE memo_id = ?)"), append(args, *v)
+	}
+
+	fields := []string{"resource.id", "resource.filename", "resource.type", "resource.size", "resource.created_ts", "resource.updated_ts", "internal_path", "external_link"}
+	if find.GetBlob {
+		fields = append(fields, "resource.blob")
 	}
 
 	query := fmt.Sprintf(`
@@ -214,6 +195,20 @@ func (s *Store) FindResourceList(ctx context.Context, find *ResourceFind) ([]*Re
 	}
 
 	return resourceList, nil
+}
+
+func (s *Store) FindResource(ctx context.Context, find *ResourceFind) (*Resource, error) {
+	list, err := s.FindResourceList(ctx, find)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) == 0 {
+		return nil, errors.New("not found")
+	}
+
+	resource := list[0]
+
+	return resource, nil
 }
 
 type ResourceDelete struct {

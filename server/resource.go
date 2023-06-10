@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"mails/store"
@@ -10,6 +11,8 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -159,6 +162,48 @@ func (server *Server) createResourceBlob(c echo.Context) error {
 	})
 }
 
+func (server *Server) downloadResource(c echo.Context) error {
+	ctx := c.Request().Context()
+	resourceID, err := strconv.Atoi(c.Param("resourceId"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("resourceId"))).SetInternal(err)
+	}
+
+	resource, err := server.store.FindResource(ctx, &store.ResourceFind{
+		ID:      &resourceID,
+		GetBlob: true,
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to find resource by ID: %v", resourceID)).SetInternal(err)
+	}
+
+	blob := resource.Blob
+	if resource.InternalPath != "" {
+		resourcePath := resource.InternalPath
+		src, err := os.Open(resourcePath)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to open the local resource: %s", resourcePath)).SetInternal(err)
+		}
+		defer src.Close()
+		blob, err = io.ReadAll(src)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, fmt.Sprintf("Failed to read the local resource: %s", resourcePath)).SetInternal(err)
+		}
+	}
+
+	c.Response().Writer.Header().Set(echo.HeaderCacheControl, "max-age=31536000, immutable")
+	c.Response().Writer.Header().Set(echo.HeaderContentSecurityPolicy, "default-src 'self'")
+	resourceType := strings.ToLower(resource.Type)
+	if strings.HasPrefix(resourceType, "text") {
+		resourceType = echo.MIMETextPlainCharsetUTF8
+	} else if strings.HasPrefix(resourceType, "video") || strings.HasPrefix(resourceType, "audio") {
+		http.ServeContent(c.Response(), c.Request(), resource.Filename, time.Unix(resource.UpdatedTs, 0), bytes.NewReader(blob))
+		return nil
+	}
+
+	return c.Stream(http.StatusOK, resourceType, bytes.NewReader(blob))
+}
+
 func (server *Server) findResourceList(c echo.Context) error {
 	ctx := c.Request().Context()
 
@@ -186,7 +231,9 @@ func (server *Server) deleteResource(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("resourceId"))).SetInternal(err)
 	}
 
-	resource, err := server.store.FindResource(ctx, resourceID)
+	resource, err := server.store.FindResource(ctx, &store.ResourceFind{
+		ID: &resourceID,
+	})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find resource").SetInternal(err)
 	}
@@ -195,6 +242,7 @@ func (server *Server) deleteResource(c echo.Context) error {
 			log.Warn(fmt.Sprintf("failed to delete local file with path %s", resource.InternalPath), zap.Error(err))
 		}
 	}
+
 	if err := server.store.DeleteResource(ctx, &store.ResourceDelete{ID: resourceID}); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete resource").SetInternal(err)
 	}
