@@ -79,7 +79,7 @@ func smtpLoginTest(host string, port int, email string, password string) error {
 func (server *Server) listAllSenders(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	result, err := server.store.ListAllSenders(ctx)
+	result, err := server.store.FindSenderList(ctx, &store.SenderFind{})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -98,7 +98,9 @@ func (server *Server) getSender(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("senderId")))
 	}
-	sender, err := server.store.GetSender(ctx, senderID)
+	sender, err := server.store.FindSender(ctx, &store.SenderFind{
+		ID: &senderID,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -117,7 +119,9 @@ func (server *Server) deleteSender(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("senderId")))
 	}
-	err = server.store.DeleteSender(ctx, senderID)
+	err = server.store.DeleteSender(ctx, &store.SenderDelete{
+		ID: senderID,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),

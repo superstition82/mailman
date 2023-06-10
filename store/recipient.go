@@ -3,140 +3,168 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
+	"strings"
 )
 
 type Recipient struct {
 	ID int `json:"id"`
 
-	// Domain specific fields
-	Email     string `json:"email"`
-	Reachable string `json:"reachable"`
-
 	// Standard fields
 	CreatedTs int64 `json:"createdTs"`
 	UpdatedTs int64 `json:"updatedTs"`
+
+	// Domain specific fields
+	Email     string `json:"email"`
+	Reachable string `json:"reachable"`
 }
 
-const createRecipient = `
-	INSERT INTO recipient (email, reachable) 
-	VALUES (?, ?)
-	RETURNING id, email, reachable, created_ts, updated_ts
-`
-
-type CreateRecipientParams struct {
+type RecipientCreate struct {
 	Email     string
 	Reachable string
 }
 
-func (s *Store) CreateRecipient(ctx context.Context, arg CreateRecipientParams) (Recipient, error) {
-	row := s.db.QueryRowContext(ctx, createRecipient, arg.Email, arg.Reachable)
+func (s *Store) CreateRecipient(ctx context.Context, create *RecipientCreate) (*Recipient, error) {
+	query := `
+		INSERT INTO recipient (email, reachable) 
+		VALUES ($1, $2)
+		RETURNING id, email, reachable, created_ts, updated_ts
+	`
+	row := s.db.QueryRowContext(
+		ctx,
+		query,
+		create.Email,
+		create.Reachable,
+	)
+
 	var recipient Recipient
-	err := row.Scan(&recipient.ID, &recipient.Email, &recipient.Reachable, &recipient.CreatedTs, &recipient.UpdatedTs)
-	return recipient, err
+	err := row.Scan(
+		&recipient.ID,
+		&recipient.Email,
+		&recipient.Reachable,
+		&recipient.CreatedTs,
+		&recipient.UpdatedTs,
+	)
+	return &recipient, err
 }
 
-const getRecipient = `
-	SELECT id, email, reachable, created_ts, updated_ts 
-	FROM recipient
-	WHERE id = ? LIMIT 1
-`
+type RecipientFind struct {
+	ID *int `json:"id"`
 
-func (s *Store) GetRecipient(ctx context.Context, id int) (Recipient, error) {
-	row := s.db.QueryRowContext(ctx, getRecipient, id)
-	var recipient Recipient
-	err := row.Scan(&recipient.ID, &recipient.Email, &recipient.Reachable, &recipient.CreatedTs, &recipient.UpdatedTs)
-	return recipient, err
+	// Pagination
+	Limit  *int
+	Offset *int
 }
 
-const listAllRecipients = `
-	SELECT id, email, reachable, created_ts, updated_ts  
-	FROM recipient
-	ORDER BY id
-`
+func (s *Store) FindRecipientList(ctx context.Context, find *RecipientFind) ([]*Recipient, error) {
+	where, args := []string{"1 = 1"}, []any{}
 
-func (s *Store) FindRecepientList(ctx context.Context) ([]Recipient, error) {
-	rows, err := s.db.QueryContext(ctx, listAllRecipients)
-	if err != nil {
-		return nil, err
+	if v := find.ID; v != nil {
+		where, args = append(where, "recipient.id = ?"), append(args, *v)
 	}
-	defer rows.Close()
-	var items []Recipient
-	for rows.Next() {
-		var recipient Recipient
-		if err := rows.Scan(&recipient.ID, &recipient.Email, &recipient.Reachable, &recipient.CreatedTs, &recipient.UpdatedTs); err != nil {
-			return nil, err
+
+	fields := []string{"recipient.id", "recipient.email", "recipient.reachable", "recipient.created_ts", "recipient.updated_ts"}
+	query := fmt.Sprintf(`
+		SELECT %s
+		FROM recipient
+		WHERE %s
+		ORDER BY id DESC
+	`, strings.Join(fields, ", "), strings.Join(where, " AND "))
+	if find.Limit != nil {
+		query = fmt.Sprintf("%s LIMIT %d", query, *find.Limit)
+		if find.Offset != nil {
+			query = fmt.Sprintf("%s OFFSET %d", query, *find.Offset)
 		}
-		items = append(items, recipient)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
 	}
 
-	return items, nil
-}
-
-const listRecipients = `
-	SELECT id, email, reachable, created_ts, updated_ts  
-	FROM recipient
-	ORDER BY id LIMIT ? OFFSET ?
-`
-
-type ListRecipientsParams struct {
-	Limit  int
-	Offset int
-}
-
-func (s *Store) ListRecipients(ctx context.Context, arg ListRecipientsParams) ([]Recipient, error) {
-	rows, err := s.db.QueryContext(ctx, listRecipients, arg.Limit, arg.Offset)
+	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var items []Recipient
+	recipientList := make([]*Recipient, 0)
 	for rows.Next() {
 		var recipient Recipient
-		if err := rows.Scan(&recipient.ID, &recipient.Email, &recipient.Reachable, &recipient.CreatedTs, &recipient.UpdatedTs); err != nil {
+		dests := []any{
+			&recipient.ID,
+			&recipient.Email,
+			&recipient.Reachable,
+			&recipient.CreatedTs,
+			&recipient.UpdatedTs,
+		}
+		if err := rows.Scan(dests...); err != nil {
 			return nil, err
 		}
-		items = append(items, recipient)
+		recipientList = append(recipientList, &recipient)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
+
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return items, nil
+	return recipientList, nil
 }
 
-const updateRecipient = `
-	UPDATE recipient
-	SET 
-		email = COALESCE(?, email),
-		reachable = COALESCE(?, reachable)
-	WHERE
-		id = ?
-	RETURNING id, email, reachable, created_ts, updated_ts
-`
+func (s *Store) FindRecipient(ctx context.Context, find *RecipientFind) (*Recipient, error) {
+	list, err := s.FindRecipientList(ctx, find)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) == 0 {
+		return nil, errors.New("not found")
+	}
+	recipient := list[0]
 
-type UpdateRecipientParams struct {
-	ID int `json:"id"`
+	return recipient, nil
+}
+
+type RecipientPatch struct {
+	ID int `json:"-"`
+
+	// Standard fields
+	UpdatedTs *int64
 
 	// Domain specific fields
-	Email     string `json:"email"`
-	Reachable string `json:"reachable"`
+	Email     *string `json:"filename"`
+	Reachable *string `json:"reachable"`
 }
 
-func (s *Store) UpdateRecipient(ctx context.Context, arg UpdateRecipientParams) (Recipient, error) {
-	row := s.db.QueryRowContext(ctx, updateRecipient, arg.Email, arg.Reachable, arg.ID)
+func (s *Store) PatchRecipient(ctx context.Context, patch *RecipientPatch) (*Recipient, error) {
+	set, args := []string{}, []any{}
+
+	if v := patch.UpdatedTs; v != nil {
+		set, args = append(set, "updated_ts = ?"), append(args, *v)
+	}
+	if v := patch.Email; v != nil {
+		set, args = append(set, "email = ?"), append(args, *v)
+	}
+	if v := patch.Reachable; v != nil {
+		set, args = append(set, "reachable = ?"), append(args, *v)
+	}
+
+	args = append(args, patch.ID)
+	fields := []string{"recipient.id", "recipient.email", "recipient.reachable", "recipient.created_ts", "recipient.updated_ts"}
+	query := `
+		UPDATE recipient
+		SET ` + strings.Join(set, ", ") + `
+		WHERE id = ?
+		RETURNING ` + strings.Join(fields, ", ")
 	var recipient Recipient
-	err := row.Scan(&recipient.ID, &recipient.Email, &recipient.Reachable, &recipient.CreatedTs, &recipient.UpdatedTs)
-	return recipient, err
+	dests := []any{
+		&recipient.ID,
+		&recipient.Email,
+		&recipient.Reachable,
+		&recipient.CreatedTs,
+		&recipient.UpdatedTs,
+	}
+
+	if err := s.db.QueryRowContext(ctx, query, args...).Scan(dests...); err != nil {
+		return nil, err
+	}
+
+	return &recipient, nil
 }
 
 const deleteRecipient = `
@@ -144,9 +172,25 @@ const deleteRecipient = `
 	WHERE id = ?
 `
 
-func (s *Store) DeleteRecipient(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, deleteRecipient, id)
-	return err
+type RecipientDelete struct {
+	ID int
+}
+
+func (s *Store) DeleteRecipient(ctx context.Context, delete *RecipientDelete) error {
+	where, args := []string{"id = ?"}, []any{delete.ID}
+
+	stmt := `DELETE FROM recipient WHERE ` + strings.Join(where, " AND ")
+	result, err := s.db.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return errors.New("recipient not found")
+	}
+
+	return nil
 }
 
 func (s *Store) DeleteBulkRecipient(ctx context.Context, ids []int) error {
@@ -154,7 +198,6 @@ func (s *Store) DeleteBulkRecipient(ctx context.Context, ids []int) error {
 	if err != nil {
 		return err
 	}
-
 	for _, id := range ids {
 		_, err = tx.Exec(deleteRecipient, id)
 		if err != nil {
@@ -162,11 +205,9 @@ func (s *Store) DeleteBulkRecipient(ctx context.Context, ids []int) error {
 			return nil
 		}
 	}
-
 	err = tx.Commit()
 	if err != nil {
 		return nil
 	}
-
 	return nil
 }

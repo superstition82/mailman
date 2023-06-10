@@ -32,7 +32,7 @@ const createResource = `
 	RETURNING id, filename, blob, type, size, internal_path, external_link, created_ts, updated_ts
 `
 
-type CreateResourceParams struct {
+type ResourceCreate struct {
 	Filename     string
 	Blob         []byte
 	InternalPath string
@@ -41,7 +41,7 @@ type CreateResourceParams struct {
 	Size         int64
 }
 
-func (s *Store) CreateResource(ctx context.Context, create CreateResourceParams) (*Resource, error) {
+func (s *Store) CreateResource(ctx context.Context, create *ResourceCreate) (*Resource, error) {
 	row := s.db.QueryRowContext(
 		ctx,
 		createResource,
@@ -67,59 +67,13 @@ func (s *Store) CreateResource(ctx context.Context, create CreateResourceParams)
 	return &resource, err
 }
 
-type ResourcePatch struct {
-	ID int `json:"-"`
-
-	// Standard fields
-	UpdatedTs *int64
-
-	// Domain specific fields
-	Filename *string `json:"filename"`
-}
-
-func (s *Store) PatchResource(ctx context.Context, patch ResourcePatch) (*Resource, error) {
-	set, args := []string{}, []any{}
-
-	if v := patch.UpdatedTs; v != nil {
-		set, args = append(set, "updated_ts = ?"), append(args, *v)
-	}
-	if v := patch.Filename; v != nil {
-		set, args = append(set, "filename = ?"), append(args, *v)
-	}
-
-	args = append(args, patch.ID)
-	fields := []string{"id", "filename", "type", "size", "created_ts", "updated_ts", "internal_path", "external_link"}
-	query := `
-		UPDATE resource
-		SET ` + strings.Join(set, ", ") + `
-		WHERE id = ?
-		RETURNING ` + strings.Join(fields, ", ")
-	var resource Resource
-	dests := []any{
-		&resource.ID,
-		&resource.Filename,
-		&resource.Type,
-		&resource.Size,
-		&resource.CreatedTs,
-		&resource.UpdatedTs,
-		&resource.InternalPath,
-		&resource.ExternalLink,
-	}
-
-	if err := s.db.QueryRowContext(ctx, query, args...).Scan(dests...); err != nil {
-		return nil, err
-	}
-
-	return &resource, nil
-}
-
 type ResourceFind struct {
 	ID *int `json:"id"`
 
 	// Domain specific fields
-	Filename *string `json:"filename"`
-	MemoID   *int
-	GetBlob  bool
+	Filename   *string `json:"filename"`
+	TemplateID *int
+	GetBlob    bool
 
 	// Pagination
 	Limit  *int
@@ -135,15 +89,14 @@ func (s *Store) FindResourceList(ctx context.Context, find *ResourceFind) ([]*Re
 	if v := find.Filename; v != nil {
 		where, args = append(where, "resource.filename = ?"), append(args, *v)
 	}
-	if v := find.MemoID; v != nil {
-		where, args = append(where, "resource.id in (SELECT resource_id FROM memo_resource WHERE memo_id = ?)"), append(args, *v)
+	if v := find.TemplateID; v != nil {
+		where, args = append(where, "resource.id in (SELECT resource_id FROM template_resources WHERE template_id = ?)"), append(args, *v)
 	}
 
 	fields := []string{"resource.id", "resource.filename", "resource.type", "resource.size", "resource.created_ts", "resource.updated_ts", "internal_path", "external_link"}
 	if find.GetBlob {
 		fields = append(fields, "resource.blob")
 	}
-
 	query := fmt.Sprintf(`
 		SELECT
 			COUNT(DISTINCT template_resource.template_id) AS linked_template_amount,
@@ -205,10 +158,55 @@ func (s *Store) FindResource(ctx context.Context, find *ResourceFind) (*Resource
 	if len(list) == 0 {
 		return nil, errors.New("not found")
 	}
-
 	resource := list[0]
 
 	return resource, nil
+}
+
+type ResourcePatch struct {
+	ID int `json:"-"`
+
+	// Standard fields
+	UpdatedTs *int64
+
+	// Domain specific fields
+	Filename *string `json:"filename"`
+}
+
+func (s *Store) PatchResource(ctx context.Context, patch *ResourcePatch) (*Resource, error) {
+	set, args := []string{}, []any{}
+
+	if v := patch.UpdatedTs; v != nil {
+		set, args = append(set, "updated_ts = ?"), append(args, *v)
+	}
+	if v := patch.Filename; v != nil {
+		set, args = append(set, "filename = ?"), append(args, *v)
+	}
+
+	args = append(args, patch.ID)
+	fields := []string{"id", "filename", "type", "size", "created_ts", "updated_ts", "internal_path", "external_link"}
+	query := `
+		UPDATE resource
+		SET ` + strings.Join(set, ", ") + `
+		WHERE id = ?
+		RETURNING ` + strings.Join(fields, ", ")
+	var resource Resource
+	dests := []any{
+		&resource.ID,
+		&resource.Filename,
+		&resource.Type,
+		&resource.Size,
+		&resource.CreatedTs,
+		&resource.UpdatedTs,
+		&resource.InternalPath,
+		&resource.ExternalLink,
+	}
+
+	if err := s.db.QueryRowContext(ctx, query, args...).Scan(dests...); err != nil {
+		return nil, err
+	}
+
+	return &resource, nil
 }
 
 type ResourceDelete struct {

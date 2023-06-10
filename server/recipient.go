@@ -25,11 +25,11 @@ func (server *Server) createRecipient(c echo.Context) error {
 		})
 	}
 
-	createRecipientParams := store.CreateRecipientParams{
+	recipientCreate := store.RecipientCreate{
 		Email:     body.Email,
 		Reachable: "unknown",
 	}
-	recipient, err := server.store.CreateRecipient(ctx, createRecipientParams)
+	recipient, err := server.store.CreateRecipient(ctx, &recipientCreate)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -41,10 +41,10 @@ func (server *Server) createRecipient(c echo.Context) error {
 	})
 }
 
-func (server *Server) listAllRecipients(c echo.Context) error {
+func (server *Server) findRecipientList(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	result, err := server.store.FindRecepientList(ctx)
+	result, err := server.store.FindRecipientList(ctx, &store.RecipientFind{})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -56,14 +56,16 @@ func (server *Server) listAllRecipients(c echo.Context) error {
 	})
 }
 
-func (server *Server) getRecipient(c echo.Context) error {
+func (server *Server) findRecipient(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	recipientID, err := strconv.Atoi(c.Param("recipientId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("recipientId")))
 	}
-	recipient, err := server.store.GetRecipient(ctx, recipientID)
+	recipient, err := server.store.FindRecipient(ctx, &store.RecipientFind{
+		ID: &recipientID,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -82,7 +84,9 @@ func (server *Server) deleteRecipient(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("recipientId")))
 	}
-	err = server.store.DeleteRecipient(ctx, recipientID)
+	err = server.store.DeleteRecipient(ctx, &store.RecipientDelete{
+		ID: recipientID,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -118,38 +122,46 @@ func (server *Server) deleteBulkRecipient(c echo.Context) error {
 var (
 	verifier = emailverifier.
 		NewVerifier().
-		EnableSMTPCheck()
+		EnableSMTPCheck().
+		DisableCatchAllCheck()
 )
 
 func (server *Server) validateRecipient(c echo.Context) error {
 	ctx := c.Request().Context()
+	fmt.Println("=== verify recipient ===")
 
 	recipientID, err := strconv.Atoi(c.Param("recipientId"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("recipientId")))
 	}
 
-	recipient, err := server.store.GetRecipient(ctx, recipientID)
+	recipient, err := server.store.FindRecipient(ctx, &store.RecipientFind{
+		ID: &recipientID,
+	})
 	if err != nil {
+		fmt.Println(err.Error())
 		return c.JSON(http.StatusBadRequest, &errorResponse{
-			Message: "bad request",
+			Message: "recipient not found",
 		})
 	}
 
-	var updatedRecipient store.Recipient
+	var updatedRecipient *store.Recipient
 	if recipient.Reachable == "unknown" {
 		verifiedResult, err := verifier.Verify(recipient.Email)
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, &errorResponse{
-				Message: "bad request",
+				Message: "failed to verify",
 			})
 		}
+		fmt.Println("verify recipient success")
 
-		updatedRecipient, err = server.store.UpdateRecipient(ctx, store.UpdateRecipientParams{
+		updatedRecipient, err = server.store.PatchRecipient(ctx, &store.RecipientPatch{
 			ID:        recipient.ID,
-			Email:     recipient.Email,
-			Reachable: verifiedResult.Reachable,
+			Email:     &recipient.Email,
+			Reachable: &verifiedResult.Reachable,
 		})
+		fmt.Println("update recipient success")
+
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, &errorResponse{
 				Message: err.Error(),
@@ -183,9 +195,9 @@ func (server *Server) importRecipientsByFile(c echo.Context) error {
 
 	// Read the file content line by line
 	scanner := bufio.NewScanner(src)
-	var recipients []store.Recipient
+	var recipients []*store.Recipient
 	for scanner.Scan() {
-		recipient, err := server.store.CreateRecipient(ctx, store.CreateRecipientParams{
+		recipient, err := server.store.CreateRecipient(ctx, &store.RecipientCreate{
 			Email:     scanner.Text(),
 			Reachable: "unknown",
 		})

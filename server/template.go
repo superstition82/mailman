@@ -24,11 +24,11 @@ func (server *Server) createTemplate(c echo.Context) error {
 		})
 	}
 
-	createTemplateParams := store.CreateTemplateParams{
+	createTemplateParams := store.TemplateCreate{
 		Subject: body.Subject,
 		Body:    body.Body,
 	}
-	template, err := server.store.CreateTemplate(ctx, createTemplateParams)
+	template, err := server.store.CreateTemplate(ctx, &createTemplateParams)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -43,7 +43,7 @@ func (server *Server) createTemplate(c echo.Context) error {
 func (server *Server) findTemplateList(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	result, err := server.store.ListAllTemplates(ctx)
+	result, err := server.store.FindTemplateList(ctx, &store.TemplateFind{})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -62,7 +62,9 @@ func (server *Server) getTemplate(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("templateId")))
 	}
-	template, err := server.store.GetTemplate(ctx, templateId)
+	template, err := server.store.FindTemplate(ctx, &store.TemplateFind{
+		ID: &templateId,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -92,7 +94,9 @@ func (server *Server) updateTemplate(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("templateId")))
 	}
-	template, err := server.store.GetTemplate(ctx, templateId)
+	template, err := server.store.FindTemplate(ctx, &store.TemplateFind{
+		ID: &templateId,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -108,12 +112,12 @@ func (server *Server) updateTemplate(c echo.Context) error {
 		body.Body = template.Body
 	}
 
-	updateTemplateParams := store.UpdateTemplateParams{
+	templatePatch := store.TemplatePatch{
 		ID:      templateId,
-		Subject: body.Subject,
-		Body:    body.Body,
+		Subject: &body.Subject,
+		Body:    &body.Body,
 	}
-	template, err = server.store.UpdateTemplate(ctx, updateTemplateParams)
+	template, err = server.store.PatchTemplate(ctx, &templatePatch)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
@@ -132,7 +136,9 @@ func (server *Server) deleteTemplate(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("templateId")))
 	}
-	err = server.store.DeleteTemplate(ctx, templateId)
+	err = server.store.DeleteTemplate(ctx, &store.TemplateDelete{
+		ID: templateId,
+	})
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),

@@ -48,7 +48,7 @@ func (server *Server) createResource(c echo.Context) error {
 		})
 	}
 
-	createResourceParams := store.CreateResourceParams{
+	createResourceParams := store.ResourceCreate{
 		Filename:     body.Filename,
 		ExternalLink: body.ExternalLink,
 	}
@@ -93,7 +93,7 @@ func (server *Server) createResource(c echo.Context) error {
 		}
 	}
 
-	resource, err := server.store.CreateResource(ctx, createResourceParams)
+	resource, err := server.store.CreateResource(ctx, &createResourceParams)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create resource").SetInternal(err)
 	}
@@ -145,14 +145,14 @@ func (server *Server) createResourceBlob(c echo.Context) error {
 	}
 
 	// [*] save on db storage as blob
-	createResourceParams := store.CreateResourceParams{
+	createResourceParams := store.ResourceCreate{
 		Filename: file.Filename,
 		Type:     filetype,
 		Size:     size,
 		Blob:     fileBytes,
 	}
 
-	resource, err := server.store.CreateResource(ctx, createResourceParams)
+	resource, err := server.store.CreateResource(ctx, &createResourceParams)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create resource").SetInternal(err)
 	}

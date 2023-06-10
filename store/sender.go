@@ -3,20 +3,23 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
+	"strings"
 )
 
 type Sender struct {
 	ID int `json:"id"`
+
+	// Standard fields
+	CreatedTs int64 `json:"createdTs"`
+	UpdatedTs int64 `json:"updatedTs"`
 
 	// Domain specific fields
 	Host     string `json:"host"`
 	Port     int    `json:"port"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-
-	// Standard fields
-	CreatedTs int64 `json:"createdTs"`
-	UpdatedTs int64 `json:"updatedTs"`
 }
 
 const createSender = `
@@ -32,7 +35,7 @@ type CreateSenderParams struct {
 	Password string
 }
 
-func (s *Store) CreateSender(ctx context.Context, arg CreateSenderParams) (Sender, error) {
+func (s *Store) CreateSender(ctx context.Context, arg CreateSenderParams) (*Sender, error) {
 	row := s.db.QueryRowContext(ctx, createSender, arg.Host, arg.Port, arg.Email, arg.Password)
 	var sender Sender
 	err := row.Scan(
@@ -44,74 +47,48 @@ func (s *Store) CreateSender(ctx context.Context, arg CreateSenderParams) (Sende
 		&sender.CreatedTs,
 		&sender.UpdatedTs,
 	)
-	return sender, err
+	return &sender, err
 }
 
-const getSender = `
-	SELECT id, host, port, email, password, created_ts, updated_ts
-	FROM sender
-	WHERE id = ? LIMIT 1
-`
+type SenderFind struct {
+	ID *int `json:"id"`
 
-func (s *Store) GetSender(ctx context.Context, id int) (Sender, error) {
-	row := s.db.QueryRowContext(ctx, getSender, id)
-	var sender Sender
-	err := row.Scan(&sender.ID, &sender.Host, &sender.Port, &sender.Email, &sender.Password, &sender.CreatedTs, &sender.UpdatedTs)
-	return sender, err
+	// Pagination
+	Limit  *int
+	Offset *int
 }
 
-const listAllSenders = `
-	SELECT id, host, port, email, password, created_ts, updated_ts
-	FROM sender
-	ORDER BY id
-`
+func (s *Store) FindSenderList(ctx context.Context, find *SenderFind) ([]*Sender, error) {
+	where, args := []string{"1 = 1"}, []any{}
 
-func (s *Store) ListAllSenders(ctx context.Context) ([]Sender, error) {
-	rows, err := s.db.QueryContext(ctx, listAllSenders)
-	if err != nil {
-		return nil, err
+	if v := find.ID; v != nil {
+		where, args = append(where, "sender.id = ?"), append(args, *v)
 	}
-	defer rows.Close()
-	var items []Sender
-	for rows.Next() {
-		var sender Sender
-		if err := rows.Scan(&sender.ID, &sender.Host, &sender.Port, &sender.Email, &sender.Password, &sender.CreatedTs, &sender.UpdatedTs); err != nil {
-			return nil, err
+
+	fields := []string{"sender.id", "sender.host", "sender.port", "sender.email", "sender.password", "sender.created_ts", "sender.updated_ts"}
+	query := fmt.Sprintf(`
+		SELECT %s
+		FROM sender
+		WHERE %s
+		ORDER BY sender.id DESC
+	`, strings.Join(fields, ", "), strings.Join(where, " AND "))
+	if find.Limit != nil {
+		query = fmt.Sprintf("%s LIMIT %d", query, *find.Limit)
+		if find.Offset != nil {
+			query = fmt.Sprintf("%s OFFSET %d", query, *find.Offset)
 		}
-		items = append(items, sender)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
 	}
 
-	return items, nil
-}
-
-const listSenders = `
-	SELECT id, host, port, email, password, created_ts, updated_ts
-	FROM sender
-	ORDER BY id LIMIT ? OFFSET ?
-`
-
-type ListSendersParams struct {
-	Limit  int
-	Offset int
-}
-
-func (s *Store) ListSenders(ctx context.Context, arg ListSendersParams) ([]Sender, error) {
-	rows, err := s.db.QueryContext(ctx, listSenders, arg.Limit, arg.Offset)
+	rows, err := s.db.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var items []Sender
+	senderList := make([]*Sender, 0)
 	for rows.Next() {
 		var sender Sender
-		if err := rows.Scan(
+		dests := []any{
 			&sender.ID,
 			&sender.Host,
 			&sender.Port,
@@ -119,18 +96,32 @@ func (s *Store) ListSenders(ctx context.Context, arg ListSendersParams) ([]Sende
 			&sender.Password,
 			&sender.CreatedTs,
 			&sender.UpdatedTs,
-		); err != nil {
+		}
+		if err := rows.Scan(dests...); err != nil {
 			return nil, err
 		}
-		items = append(items, sender)
+		senderList = append(senderList, &sender)
 	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
+
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	return items, nil
+
+	return senderList, nil
+}
+
+func (s *Store) FindSender(ctx context.Context, find *SenderFind) (*Sender, error) {
+	list, err := s.FindSenderList(ctx, find)
+	if err != nil {
+		return nil, err
+	}
+	if len(list) == 0 {
+		return nil, errors.New("not found")
+	}
+
+	sender := list[0]
+
+	return sender, nil
 }
 
 const deleteSender = `
@@ -138,9 +129,25 @@ const deleteSender = `
 	WHERE id = ?
 `
 
-func (s *Store) DeleteSender(ctx context.Context, id int) error {
-	_, err := s.db.ExecContext(ctx, deleteSender, id)
-	return err
+type SenderDelete struct {
+	ID int
+}
+
+func (s *Store) DeleteSender(ctx context.Context, delete *SenderDelete) error {
+	where, args := []string{"id = ?"}, []any{delete.ID}
+
+	stmt := `DELETE FROM sender WHERE ` + strings.Join(where, " AND ")
+	result, err := s.db.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return errors.New("sender not found")
+	}
+
+	return nil
 }
 
 func (s *Store) DeleteBulkSender(ctx context.Context, ids []int) error {
