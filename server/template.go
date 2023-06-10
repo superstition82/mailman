@@ -40,7 +40,7 @@ func (server *Server) createTemplate(c echo.Context) error {
 	})
 }
 
-func (server *Server) listAllTemplates(c echo.Context) error {
+func (server *Server) findTemplateList(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	result, err := server.store.ListAllTemplates(ctx)

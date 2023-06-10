@@ -81,7 +81,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	// template endpoint
 	templateGroup := apiGroup.Group("/template")
 	templateGroup.POST("", s.createTemplate)
-	templateGroup.GET("", s.listAllTemplates)
+	templateGroup.GET("", s.findTemplateList)
 	templateGroup.GET("/:templateId", s.getTemplate)
 	templateGroup.PATCH("/:templateId", s.updateTemplate)
 	templateGroup.DELETE("/:templateId", s.deleteTemplate)
@@ -91,6 +91,8 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	resourceGroup := apiGroup.Group("/resource")
 	resourceGroup.POST("", s.createResource)
 	resourceGroup.POST("/blob", s.createResourceBlob)
+	resourceGroup.GET("", s.findResourceList)
+	resourceGroup.DELETE("/:resourceId", s.deleteResource)
 
 	return s, nil
 }

@@ -7,6 +7,7 @@ import (
 	"mime"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strconv"
 
@@ -156,4 +157,47 @@ func (server *Server) createResourceBlob(c echo.Context) error {
 	return c.JSON(http.StatusOK, &okResponse{
 		Data: resource,
 	})
+}
+
+func (server *Server) findResourceList(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	resourceFind := &store.ResourceFind{}
+	if limit, err := strconv.Atoi(c.QueryParam("limit")); err == nil {
+		resourceFind.Limit = &limit
+	}
+	if offset, err := strconv.Atoi(c.QueryParam("offset")); err == nil {
+		resourceFind.Offset = &offset
+	}
+
+	list, err := server.store.FindResourceList(ctx, resourceFind)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch resource list").SetInternal(err)
+	}
+	return c.JSON(http.StatusOK, &okResponse{
+		Data: list,
+	})
+}
+
+func (server *Server) deleteResource(c echo.Context) error {
+	ctx := c.Request().Context()
+	resourceID, err := strconv.Atoi(c.Param("resourceId"))
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("resourceId"))).SetInternal(err)
+	}
+
+	resource, err := server.store.FindResource(ctx, resourceID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to find resource").SetInternal(err)
+	}
+	if resource.InternalPath != "" {
+		if err := os.Remove(resource.InternalPath); err != nil {
+			log.Warn(fmt.Sprintf("failed to delete local file with path %s", resource.InternalPath), zap.Error(err))
+		}
+	}
+	if err := server.store.DeleteResource(ctx, &store.ResourceDelete{ID: resourceID}); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to delete resource").SetInternal(err)
+	}
+
+	return c.JSON(http.StatusOK, true)
 }

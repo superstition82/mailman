@@ -88,7 +88,7 @@ func (s *Store) PatchResource(ctx context.Context, patch ResourcePatch) (*Resour
 	}
 
 	args = append(args, patch.ID)
-	fields := []string{"id", "filename", "type", "size", "created_ts", "updated_ts", "internal_path", "external_path"}
+	fields := []string{"id", "filename", "type", "size", "created_ts", "updated_ts", "internal_path", "external_link"}
 	query := `
 		UPDATE resource
 		SET ` + strings.Join(set, ", ") + `
@@ -113,6 +113,29 @@ func (s *Store) PatchResource(ctx context.Context, patch ResourcePatch) (*Resour
 	return &resource, nil
 }
 
+func (s *Store) FindResource(ctx context.Context, id int) (*Resource, error) {
+	fields := []string{"id", "filename", "type", "size", "created_ts", "updated_ts", "internal_path", "external_link"}
+	query := fmt.Sprintf(`
+	SELECT %s FROM resource
+	WHERE resource.id = %d
+`, strings.Join(fields, ", "), id)
+
+	row := s.db.QueryRowContext(ctx, query, id)
+	var resource Resource
+	err := row.Scan(
+		&resource.ID,
+		&resource.Filename,
+		&resource.Type,
+		&resource.Size,
+		&resource.CreatedTs,
+		&resource.UpdatedTs,
+		&resource.InternalPath,
+		&resource.ExternalLink,
+	)
+
+	return &resource, err
+}
+
 type ResourceFind struct {
 	ID *int `json:"id"`
 
@@ -128,7 +151,7 @@ type ResourceFind struct {
 
 func (s *Store) FindResourceList(ctx context.Context, find *ResourceFind) ([]*Resource, error) {
 	where, args := []string{"1 = 1"}, []any{}
-	fields := []string{"resource.id", "resource.filename", "resource.type", "resource.size", "resource.created_ts", "resource.updated_ts", "internal_path", "external_path"}
+	fields := []string{"resource.id", "resource.filename", "resource.type", "resource.size", "resource.created_ts", "resource.updated_ts", "internal_path", "external_link"}
 
 	if v := find.ID; v != nil {
 		where, args = append(where, "resource.id = ?"), append(args, *v)
