@@ -17,7 +17,7 @@ export const useSenderStore = () => {
 
   return {
     state,
-    fetchSenders: async (limit = 10, offset = 0) => {
+    fetchSenders: async (limit?: number, offset?: number) => {
       store.dispatch(setIsFetching(true));
       const senderFind: SenderFind = {
         limit,

@@ -166,10 +166,14 @@ func (server *Server) validateRecipient(c echo.Context) error {
 				Message: err.Error(),
 			})
 		}
+
+		return c.JSON(http.StatusOK, &okResponse{
+			Data: updatedRecipient,
+		})
 	}
 
 	return c.JSON(http.StatusOK, &okResponse{
-		Data: updatedRecipient,
+		Data: recipient,
 	})
 }
 

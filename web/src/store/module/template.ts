@@ -18,7 +18,7 @@ export const useTemplateStore = () => {
   return {
     state,
     fetchTemplateById,
-    fetchTemplates: async (limit = 10, offset = 0) => {
+    fetchTemplates: async (limit?: number, offset?: number) => {
       store.dispatch(setIsFetching(true));
       const templateFind = { limit, offset };
       const { data } = (await api.getTemplateList(templateFind)).data;

@@ -43,23 +43,23 @@ function RecipientManagementTable() {
   };
 
   const handleValidate = useCallback(async () => {
-    setProgress(() => ({
+    setProgress({
       current: 0,
       total: selectedIds.length,
       isLoading: true,
-    }));
-    for (const id of selectedIds) {
+    });
+    for (const selected of selectedIds) {
       setProgress((prev) => ({
         ...prev,
         current: prev.current + 1,
       }));
-      await recipientStore.validate(id);
+      await recipientStore.validate(selected);
     }
     setProgress((prev) => ({
       ...prev,
       isLoading: false,
     }));
-  }, [recipientStore, selectedIds, setProgress]);
+  }, [selectedIds, setProgress]);
 
   if (progress.isLoading) {
     const { current, total } = progress;

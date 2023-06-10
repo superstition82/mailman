@@ -20,7 +20,7 @@ export const useRecipientStore = () => {
     getState: () => {
       return store.getState().recipient;
     },
-    fetchRecipients: async (limit = 10, offset = 0) => {
+    fetchRecipients: async (limit?: number, offset?: number) => {
       store.dispatch(setIsFetching(true));
       const recipientFind: RecipientFind = {
         limit,
@@ -29,7 +29,6 @@ export const useRecipientStore = () => {
       const { data } = (await api.findRecipientList(recipientFind)).data;
       store.dispatch(upsertRecipients(data));
       store.dispatch(setIsFetching(false));
-
       return data;
     },
     fetchRecipientById,
