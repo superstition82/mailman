@@ -1,4 +1,5 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import toast from "react-hot-toast";
 import { useSenderStore } from "../../store/module/sender";
 import Icon from "../common/Icon";
 
@@ -12,29 +13,29 @@ function SenderManagementForm() {
     password: "",
   });
 
-  const handleChangeForm = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({
-        ...prev,
-        [e.target.name]: e.target.value,
-      }));
-    },
-    [form, setForm]
-  );
+  const handleChangeForm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
-  const handleSubmitForm = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
       await senderStore.createSender({
         host: form.host,
         port: +form.port,
         email: form.email,
         password: form.password,
       });
-      setForm({ host: "", port: "", email: "", password: "" });
-    },
-    [form, setForm]
-  );
+    } catch (error) {
+      console.log(error);
+      toast.error("SMTP 인증에 실패하였습니다.");
+    }
+
+    setForm({ host: "", port: "", email: "", password: "" });
+  };
 
   return (
     <form className="flex flex-wrap mb-4" onSubmit={handleSubmitForm}>
@@ -54,7 +55,7 @@ function SenderManagementForm() {
           value={form.host}
           onChange={handleChangeForm}
           placeholder="SMTP 서버명"
-          className="py-2 px-2 w-full text-sm  border-b rounded-sm"
+          className="py-2 px-2 w-full text-sm border rounded"
           required
         />
       </div>
@@ -65,7 +66,7 @@ function SenderManagementForm() {
           onChange={handleChangeForm}
           type="number"
           placeholder="포트 정보"
-          className="py-2 px-2 w-full text-sm  border-b rounded-sm"
+          className="py-2 px-2 w-full text-sm border rounded"
           required
         />
       </div>
@@ -75,7 +76,7 @@ function SenderManagementForm() {
           value={form.email}
           onChange={handleChangeForm}
           placeholder="이메일"
-          className="py-2 px-2 w-full text-sm  border-b rounded-sm"
+          className="py-2 px-2 w-full text-sm border rounded"
           required
         />
       </div>
@@ -86,7 +87,7 @@ function SenderManagementForm() {
           onChange={handleChangeForm}
           type="password"
           placeholder="비밀번호"
-          className="py-2 px-2 w-full text-sm  border-b rounded-sm"
+          className="py-2 px-2 w-full text-sm border rounded"
           required
         />
       </div>

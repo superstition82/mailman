@@ -37,7 +37,7 @@ function RecipientManagementForm() {
       </div>
       <div className="w-full flex mt-4 bg-white rounded-sm">
         <input
-          className="py-2 px-2 w-full text-sm"
+          className="py-2 px-2 w-full text-sm border rounded"
           value={form.email}
           name="email"
           placeholder="이메일"

@@ -96,8 +96,11 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	resourceGroup.POST("", s.createResource)
 	resourceGroup.POST("/blob", s.createResourceBlob)
 	resourceGroup.GET("", s.findResourceList)
-	resourceGroup.GET("/:resourceId/:filename", s.downloadResource)
 	resourceGroup.DELETE("/:resourceId", s.deleteResource)
+
+	// public group
+	publicGroup := e.Group("/o")
+	publicGroup.GET("/r/:resourceId/:filename", s.downloadResource)
 
 	return s, nil
 }

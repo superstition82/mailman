@@ -164,6 +164,7 @@ func (server *Server) createResourceBlob(c echo.Context) error {
 
 func (server *Server) downloadResource(c echo.Context) error {
 	ctx := c.Request().Context()
+
 	resourceID, err := strconv.Atoi(c.Param("resourceId"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("ID is not a number: %s", c.Param("resourceId"))).SetInternal(err)

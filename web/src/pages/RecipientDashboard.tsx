@@ -4,7 +4,7 @@ import RecipientManagementTable from "../components/recipient-management/Recipie
 function RecipientDashboard() {
   return (
     <section className="w-full max-w-3xl min-h-full flex flex-col justify-start items-center px-4 pb-8 bg-zinc-100">
-      <div className="w-full relative">
+      <div className="w-full relative px-4 py-2 rounded-xl bg-white">
         <RecipientManagementForm />
         <RecipientManagementTable />
       </div>
