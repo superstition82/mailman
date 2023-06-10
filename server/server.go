@@ -48,8 +48,11 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 			`"method":"${method}","uri":"${uri}",` +
 			`"status":${status},"error":"${error}"}` + "\n",
 	}))
+
 	e.Use(middleware.Gzip())
+
 	e.Use(middleware.CORS())
+
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
 		ErrorMessage: "Request timeout",
 		Timeout:      30 * time.Second,
