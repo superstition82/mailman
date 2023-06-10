@@ -32,6 +32,7 @@ CREATE TABLE sender (
   password TEXT NOT NULL
 );
 
+-- template
 CREATE TABLE template (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
@@ -40,10 +41,25 @@ CREATE TABLE template (
   body TEXT NOT NULL
 );
 
-CREATE TABLE template_file (
+-- resource
+CREATE TABLE resource (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  filename TEXT NOT NULL DEFAULT '',
+  blob BLOB DEFAULT NULL,
+  type TEXT NOT NULL DEFAULT '',
+  size INTEGER NOT NULL DEFAULT 0,
+  internal_path TEXT NOT NULL DEFAULT '',
+  public_id TEXT NOT NULL DEFAULT '',
+  UNIQUE(id, public_id)
+)
+
+-- template_resource
+CREATE TABLE template_resource (
   template_id INTEGER NOT NULL,
-  path TEXT NOT NULL,
-  filesize INTEGER NOT NULL,
-  FOREIGN KEY (template_id) REFERENCES template(id)
+  resource_id INTEGER NOT NULL,
+  created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
+  UNIQUE(memo_id, resource_id)
 )
