@@ -193,12 +193,16 @@ func (s *Store) DeleteRecipient(ctx context.Context, delete *RecipientDelete) er
 	return nil
 }
 
-func (s *Store) DeleteBulkRecipient(ctx context.Context, ids []int) error {
+type RecipientBulkDelete struct {
+	IDs []int
+}
+
+func (s *Store) DeleteBulkRecipient(ctx context.Context, bulkDelete *RecipientBulkDelete) error {
 	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
-	for _, id := range ids {
+	for _, id := range bulkDelete.IDs {
 		_, err = tx.Exec(deleteRecipient, id)
 		if err != nil {
 			tx.Rollback()

@@ -150,13 +150,17 @@ func (s *Store) DeleteSender(ctx context.Context, delete *SenderDelete) error {
 	return nil
 }
 
-func (s *Store) DeleteBulkSender(ctx context.Context, ids []int) error {
+type SenderBulkDelete struct {
+	IDs []int
+}
+
+func (s *Store) DeleteBulkSender(ctx context.Context, bulkDelete *SenderBulkDelete) error {
 	tx, err := s.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return err
 	}
 
-	for _, id := range ids {
+	for _, id := range bulkDelete.IDs {
 		_, err = tx.Exec(deleteSender, id)
 		if err != nil {
 			tx.Rollback()

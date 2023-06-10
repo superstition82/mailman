@@ -112,7 +112,10 @@ func (server *Server) deleteBulkRecipient(c echo.Context) error {
 		})
 	}
 
-	if err := server.store.DeleteBulkRecipient(ctx, body.Recipients); err != nil {
+	recipientBulkDelete := &store.RecipientBulkDelete{
+		IDs: body.Recipients,
+	}
+	if err := server.store.DeleteBulkRecipient(ctx, recipientBulkDelete); err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: "bad request",
 		})

@@ -145,7 +145,10 @@ func (server *Server) deleteBulkSender(c echo.Context) error {
 		})
 	}
 
-	if err := server.store.DeleteBulkSender(ctx, body.Senders); err != nil {
+	bulkDelete := &store.SenderBulkDelete{
+		IDs: body.Senders,
+	}
+	if err := server.store.DeleteBulkSender(ctx, bulkDelete); err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: "bad request",
 		})
