@@ -53,7 +53,7 @@ function Header() {
               </>
             </NavLink>
             <NavLink
-              to="/manage/sender"
+              to="/sender"
               id="header-home"
               className={({ isActive }) =>
                 `${
@@ -67,7 +67,7 @@ function Header() {
               </>
             </NavLink>
             <NavLink
-              to="/manage/recipient"
+              to="/recipient"
               id="header-review"
               className={({ isActive }) =>
                 `${
@@ -81,7 +81,7 @@ function Header() {
               </>
             </NavLink>
             <NavLink
-              to="/resources"
+              to="/resource"
               id="header-resources"
               className={({ isActive }) =>
                 `${

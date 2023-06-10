@@ -2,9 +2,10 @@ import { createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
 
 const Root = lazy(() => import("../layouts/Root"));
-const Home = lazy(() => import("../pages/TemplateManagement"));
-const SenderManagement = lazy(() => import("../pages/SenderManagement"));
-const RecipientManagement = lazy(() => import("../pages/RecipientManagement"));
+const Home = lazy(() => import("../pages/TemplateDashboard"));
+const SenderDashboard = lazy(() => import("../pages/SenderDashboard"));
+const RecipientDashboard = lazy(() => import("../pages/RecipientDashboard"));
+const ResourcesDashboard = lazy(() => import("../pages/ResourcesDashboard"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 export const router = createBrowserRouter([
@@ -17,12 +18,16 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/manage/sender",
-        element: <SenderManagement />,
+        path: "/sender",
+        element: <SenderDashboard />,
       },
       {
-        path: "/manage/recipient",
-        element: <RecipientManagement />,
+        path: "/recipient",
+        element: <RecipientDashboard />,
+      },
+      {
+        path: "/resource",
+        element: <ResourcesDashboard />,
       },
     ],
   },

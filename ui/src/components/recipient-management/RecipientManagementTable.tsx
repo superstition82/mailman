@@ -9,7 +9,7 @@ import Progress from "../common/Progress";
 function RecipientManagementTable() {
   const recipientStore = useRecipientStore();
   const { recipients, selectedIds } = recipientStore.state;
-  const [validateProgress, setValidateProgress] = useState({
+  const [progress, setProgress] = useState({
     isLoading: false,
     current: 0,
     total: 0,
@@ -35,34 +35,34 @@ function RecipientManagementTable() {
   };
 
   const handleDeleteUnreachable = async () => {
-    const unreableIds = recipients
+    const unreachableIds = recipients
       .filter((recipient) => recipient.reachable == "no")
       .map((recipient) => recipient.id);
 
-    await recipientStore.deleteBulkRecipient(unreableIds);
+    await recipientStore.deleteBulkRecipient(unreachableIds);
   };
 
   const handleValidate = useCallback(async () => {
-    setValidateProgress(() => ({
+    setProgress(() => ({
       current: 0,
       total: selectedIds.length,
       isLoading: true,
     }));
     for (const id of selectedIds) {
-      setValidateProgress((prev) => ({
+      setProgress((prev) => ({
         ...prev,
         current: prev.current + 1,
       }));
       await recipientStore.validate(id);
     }
-    setValidateProgress((prev) => ({
+    setProgress((prev) => ({
       ...prev,
       isLoading: false,
     }));
-  }, [recipientStore, selectedIds, setValidateProgress]);
+  }, [recipientStore, selectedIds, setProgress]);
 
-  if (validateProgress.isLoading) {
-    const { current, total } = validateProgress;
+  if (progress.isLoading) {
+    const { current, total } = progress;
     return <Progress current={current} total={total} />;
   }
 

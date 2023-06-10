@@ -22,5 +22,3 @@ build
 bin/air
 
 db.sqlite
-
-random_emails.txt

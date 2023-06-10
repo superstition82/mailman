@@ -4,6 +4,7 @@ import layoutReducer from "./reducer/layout";
 import senderReducer from "./reducer/sender";
 import recipientReducer from "./reducer/recipient";
 import templateReducer from "./reducer/template";
+import resourceReducer from "./reducer/resource";
 
 const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
     sender: senderReducer,
     recipient: recipientReducer,
     template: templateReducer,
+    resource: resourceReducer,
   },
 });
 

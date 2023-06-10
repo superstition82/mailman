@@ -33,7 +33,7 @@ export function deleteBulkSender(senderIds: SenderId[]) {
   });
 }
 
-export function getRecipientList(recipientFind?: RecipientFind) {
+export function findRecipientList(recipientFind?: RecipientFind) {
   return axios.get<ResponseObject<Recipient[]>>(`/api/recipient`, {
     params: {
       offset: recipientFind?.offset,
@@ -42,7 +42,7 @@ export function getRecipientList(recipientFind?: RecipientFind) {
   });
 }
 
-export function getRecipientById(recipientId: RecipientId) {
+export function findRecipientById(recipientId: RecipientId) {
   return axios.get<ResponseObject<Recipient>>(`/api/recipient/${recipientId}`);
 }
 
@@ -94,4 +94,33 @@ export function deleteBulkTemplate(templateIds: TemplateId[]) {
   return axios.post(`/api/template/bulk-delete`, {
     templates: templateIds,
   });
+}
+
+export function getResourceList() {
+  return axios.get<ResponseObject<Resource[]>>("/api/resource");
+}
+
+export function getResourceListWithLimit(resourceFind?: ResourceFind) {
+  const queryList = [];
+  if (resourceFind?.offset) {
+    queryList.push(`offset=${resourceFind.offset}`);
+  }
+  if (resourceFind?.limit) {
+    queryList.push(`limit=${resourceFind.limit}`);
+  }
+  return axios.get<ResponseObject<Resource[]>>(
+    `/api/resource?${queryList.join("&")}`
+  );
+}
+
+export function createResource(resourceCreate: ResourceCreate) {
+  return axios.post<ResponseObject<Resource>>("/api/resource", resourceCreate);
+}
+
+export function createResourceWithBlob(formData: FormData) {
+  return axios.post<ResponseObject<Resource>>("/api/resource/blob", formData);
+}
+
+export function deleteResourceById(id: ResourceId) {
+  return axios.delete(`/api/resource/${id}`);
 }

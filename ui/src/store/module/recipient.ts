@@ -11,7 +11,7 @@ import {
 export const useRecipientStore = () => {
   const state = useAppSelector((state) => state.recipient);
   const fetchRecipientById = async (recipientId: RecipientId) => {
-    const { data } = (await api.getRecipientById(recipientId)).data;
+    const { data } = (await api.findRecipientById(recipientId)).data;
     return data;
   };
 
@@ -26,14 +26,14 @@ export const useRecipientStore = () => {
         limit,
         offset,
       };
-      const { data } = (await api.getRecipientList(recipientFind)).data;
+      const { data } = (await api.findRecipientList(recipientFind)).data;
       store.dispatch(upsertRecipients(data));
       store.dispatch(setIsFetching(false));
 
       return data;
     },
     fetchRecipientById,
-    getRecipientById: async (recipientId: RecipientId) => {
+    findRecipientById: async (recipientId: RecipientId) => {
       for (const s of state.recipients) {
         if (s.id === recipientId) {
           return s;
