@@ -40,9 +40,10 @@ function SenderManagementForm() {
   return (
     <form className="flex flex-wrap mb-4" onSubmit={handleSubmitForm}>
       <div className="w-full flex items-center">
-        <h2 className="text-xl text-gray-700 font-bold">
+        <p className="flex flex-row justify-start items-center select-none rounded">
+          <Icon.UserCircle className="mr-3 w-6 h-auto opacity-70" />
           발신자 관리 ({senders.length}개)
-        </h2>
+        </p>
         <div className="p-2 flex flex-1 justify-end gap-1">
           <button className="w-12 px-4" type="submit">
             <Icon.PlusSquare className="w-6 h-auto opacity-70" />

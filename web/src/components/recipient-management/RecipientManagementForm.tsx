@@ -31,9 +31,10 @@ function RecipientManagementForm() {
   return (
     <form className="flex flex-wrap mb-4" onSubmit={handleSubmitForm}>
       <div className="w-full flex items-center">
-        <h2 className="text-xl text-gray-700 font-bold">
+        <p className="flex flex-row justify-start items-center select-none rounded pt-2">
+          <Icon.UserPlus className="mr-3 w-6 h-auto opacity-70" />
           수신자 관리 ({recipients.length}개)
-        </h2>
+        </p>
       </div>
       <div className="w-full flex mt-4 bg-white rounded-sm">
         <input

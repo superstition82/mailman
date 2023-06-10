@@ -42,9 +42,8 @@ function ResourcesDashboard() {
         <div className="w-full flex flex-col justify-start items-start px-4 py-3 rounded-xl bg-white">
           <div className="relative w-full flex flex-row justify-between items-center">
             <p className="flex flex-row justify-start items-center select-none rounded">
-              <Icon.Paperclip className="w-5 h-auto mr-1" /> resources
+              <Icon.Paperclip className="w-5 h-auto mr-1" /> 리소스
             </p>
-            {/* <ResourceSearchBar setQuery={handleSearchResourceInputChange} /> */}
           </div>
           <div className="w-full flex flex-row justify-end items-center space-x-2 mt-3 z-1">
             {selectedList.length > 0 && (
