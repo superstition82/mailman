@@ -44,7 +44,7 @@ func (server *Server) createRecipient(c echo.Context) error {
 func (server *Server) listAllRecipients(c echo.Context) error {
 	ctx := c.Request().Context()
 
-	result, err := server.store.ListAllRecipients(ctx)
+	result, err := server.store.FindRecepientList(ctx)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),

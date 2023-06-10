@@ -54,7 +54,7 @@ const listAllRecipients = `
 	ORDER BY id
 `
 
-func (s *Store) ListAllRecipients(ctx context.Context) ([]Recipient, error) {
+func (s *Store) FindRecepientList(ctx context.Context) ([]Recipient, error) {
 	rows, err := s.db.QueryContext(ctx, listAllRecipients)
 	if err != nil {
 		return nil, err

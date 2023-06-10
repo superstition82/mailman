@@ -87,6 +87,11 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	templateGroup.DELETE("/:templateId", s.deleteTemplate)
 	templateGroup.POST("/bulk-delete", s.deleteBulkTemplate)
 
+	// resource endpoint
+	resourceGroup := apiGroup.Group("/resource")
+	resourceGroup.POST("", s.createResource)
+	resourceGroup.POST("/blob", s.createResourceBlob)
+
 	return s, nil
 }
 

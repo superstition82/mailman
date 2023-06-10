@@ -1,3 +1,5 @@
+-- @author chatgpt3.5
+
 -- migration_history
 CREATE TABLE migration_history (
   version TEXT NOT NULL PRIMARY KEY,
@@ -14,6 +16,7 @@ CREATE TABLE user (
   password_hash TEXT NOT NULL
 );
 
+-- recipient
 CREATE TABLE recipient (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
@@ -22,6 +25,7 @@ CREATE TABLE recipient (
   reachable TEXT NOT NULL
 );
 
+-- sender
 CREATE TABLE sender (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
@@ -48,12 +52,11 @@ CREATE TABLE resource (
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   filename TEXT NOT NULL DEFAULT '',
   blob BLOB DEFAULT NULL,
+  external_link TEXT NOT NULL DEFAULT '',
   type TEXT NOT NULL DEFAULT '',
   size INTEGER NOT NULL DEFAULT 0,
-  internal_path TEXT NOT NULL DEFAULT '',
-  public_id TEXT NOT NULL DEFAULT '',
-  UNIQUE(id, public_id)
-)
+  internal_path TEXT NOT NULL DEFAULT ''
+);
 
 -- template_resource
 CREATE TABLE template_resource (
@@ -61,5 +64,7 @@ CREATE TABLE template_resource (
   resource_id INTEGER NOT NULL,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
-  UNIQUE(memo_id, resource_id)
-)
+  FOREIGN KEY (template_id) REFERENCES template(id),
+  FOREIGN KEY (resource_id) REFERENCES resource(id),
+  UNIQUE(template_id, resource_id)
+);
