@@ -1,5 +1,5 @@
 import * as api from "../../helpers/api";
-import store, { useAppSelector } from "../";
+import store, { useAppSelector } from "..";
 import { deleteResource, setResources } from "../reducer/resource";
 
 export const useResourceStore = () => {
