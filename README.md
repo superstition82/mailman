@@ -1,4 +1,4 @@
-# mails
+# mailman 🗞
 
 ## API Docs
 
@@ -10,37 +10,31 @@
 
 ### recipient
 
-- [x] /api/recipients/
+- [x] /api/recipient/
   - [x] 생성
   - [x] 목록
-- [ ] /api/recipient/file-import
-  - [ ] 파일 읽어서 추가
-- [ ] /api/recipient/file-export
-  - [ ] 검증된 수신자를 파일 형태로 추출
-- [x] /api/recipients/<recipient_id>/
+- [x] /api/recipient/file-import
+  - [x] 파일 읽어서 추가
+- [x] /api/recipient/file-export
+  - [x] 검증된 수신자를 파일 형태로 추출
+- [x] /api/recipient/<recipient_id>/
   - 수신자 조회, 삭제
-- [x] /api/recipients/<recipient_id>/verification
+- [x] /api/recipient/<recipient_id>/verification
   - ID 리스트를 받아 검증 시작
 
 ### template
 
-- [ ] /api/templates/
-  - [ ] 템플릿 생성, 목록
-- [ ] /api/templates/<template_id>/
-  - 템플릿 조회, 수정, 삭제
-  - 이미지, 파일 업로드 기능
+- [x] /api/templates/
+  - [x] 템플릿 생성, 목록
+- [x] /api/templates/<template_id>/
+  - [x] 템플릿 조회, 수정, 삭제
+  - [x] 이미지, 파일 업로드 기능
+    - 파일을 blob에서 읽어들여서 stream으로 쏴준다.
+    - 실제 파일 자체를 가지고 있지는 않음.
 
 ### 이슈
 
-- 검증, 메일 발송 중에 변화를 계속 확인하면서 멈출 수 있어야하므로 클라이언트에서 계속 API 요청을 하는 식으로 만들기로 함.
-- 템플릿 삭제했을 때 해당 템플릿에 포함된 파일들도 삭제되도록 설계
-  - template_file 테이블을 생성한 뒤, 삭제될 때 path에 있는 파일을 삭제하는 로직 추가
-  - 근데, 본문에서 지웠을 때 dangling 되는 경우는 해결할 수 없음..
-    - 이건, 템플릿이 지워질 때 처리될 거라고 기대
-- 이메일에 이미지를 파일을 통해 첨부하려면 base64로 인코딩한 후 blob으로 쏘는 형태와 cid를 이용한 방법이 있음.
-  - 하지만, base64 방식으로 전달 시 대부분의 메일 클라이언트에서 제대로 처리해주지 않음.
-  - 따라서 cid 방법을 이용해야하는데, 저장되는 본문과는 다르게 수정을 거쳐 메일을 전송해야 함.
-    - regex를 사용하면 일반적인 경우에서는 해결할 수 있었음.
-    - 더 좋은 방법이 있는지는 정말 고민되는 부분. 다른 구현체를 찾을 수 있으면 좋겠다.
-- 사용자 데이터가 많지 않을 거라고 가정하고 스크롤 기반 페이지네이션은 구현하지 않았다.
-  - 대신 테이블 가상화 기술로 렌더링 문제를 해결하였다.
+- 결국 모든 첨부파일은 데이터베이스로 관리하기로 결정함.
+  - 이메일을 보낼 때 파일을 전달해야하는데, 이는 임시파일을 만들어서 보내는 식으로 처리할 예정
+    - SMTP에서 뭘 요구하는지 확인이 필요하긴 함.
+- ## 에디터는 외부 라이브러리를 쓰기로 결정
