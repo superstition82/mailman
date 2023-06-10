@@ -3,7 +3,7 @@ type Props = {
   total: number;
 };
 
-const LoadingWithProgress: React.FC<Props> = ({ current, total }) => {
+function Progress({ current, total }: Props) {
   return (
     <div
       className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center z-50"
@@ -17,6 +17,6 @@ const LoadingWithProgress: React.FC<Props> = ({ current, total }) => {
       </div>
     </div>
   );
-};
+}
 
-export default LoadingWithProgress;
+export default Progress;

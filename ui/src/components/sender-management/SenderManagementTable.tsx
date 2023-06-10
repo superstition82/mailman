@@ -1,15 +1,19 @@
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useSenderStore } from "../../store/module/sender";
-import Icon from "../Icon";
+import Icon from "../common/Icon";
 
 function SenderManagementTable() {
   const senderStore = useSenderStore();
   const { senders, selectedIds } = senderStore.state;
 
   useEffect(() => {
-    senderStore.fetchSenders();
+    senderStore.fetchSenders().catch((error) => {
+      console.log(error);
+      toast.error(error.message);
+    });
   }, []);
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {

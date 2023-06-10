@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useRecipientStore } from "../../store/module/recipient";
-import Icon from "../Icon";
+import Icon from "../common/Icon";
 
 function RecipientManagementForm() {
   const recipientStore = useRecipientStore();

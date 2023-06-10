@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import { useLayoutStore } from "../store/module/layout";
-import { resolution } from "../utils/layout";
+import { useLayoutStore } from "../../store/module/layout";
+import { resolution } from "../../utils/layout";
 import Icon from "./Icon";
 
 function Header() {

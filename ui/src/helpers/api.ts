@@ -68,3 +68,30 @@ export function validateRecipient(recipientId: RecipientId) {
     `/api/recipient/${recipientId}/verification`
   );
 }
+
+export function getTemplateList(templateFind?: TemplateFind) {
+  return axios.get<ResponseObject<Template[]>>(`/api/template`, {
+    params: {
+      offset: templateFind?.offset,
+      limit: templateFind?.limit,
+    },
+  });
+}
+
+export function getTemplateById(templateId: TemplateId) {
+  return axios.get<ResponseObject<Template>>(`/api/template/${templateId}`);
+}
+
+export function createTemplate(templateCreate: TemplateCreate) {
+  return axios.post<ResponseObject<Template>>(`/api/template`, templateCreate);
+}
+
+export function deleteTemplate(templateId: TemplateId) {
+  return axios.delete(`/api/template/${templateId}`);
+}
+
+export function deleteBulkTemplate(templateIds: TemplateId[]) {
+  return axios.post(`/api/template/bulk-delete`, {
+    templates: templateIds,
+  });
+}

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useSenderStore } from "../../store/module/sender";
-import Icon from "../Icon";
+import Icon from "../common/Icon";
 
 function SenderManagementForm() {
   const senderStore = useSenderStore();

@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useRecipientStore } from "../../store/module/recipient";
-import Icon from "../Icon";
-import LoadingWithProgress from "../LoadingWithProgress";
+import Icon from "../common/Icon";
+import Progress from "../common/Progress";
 
 function RecipientManagementTable() {
   const recipientStore = useRecipientStore();
@@ -15,7 +16,10 @@ function RecipientManagementTable() {
   });
 
   useEffect(() => {
-    recipientStore.fetchRecipients();
+    recipientStore.fetchRecipients().catch((error) => {
+      console.log(error);
+      toast.error(error.message);
+    });
   }, []);
 
   const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +63,7 @@ function RecipientManagementTable() {
 
   if (validateProgress.isLoading) {
     const { current, total } = validateProgress;
-    return <LoadingWithProgress current={current} total={total} />;
+    return <Progress current={current} total={total} />;
   }
 
   return (

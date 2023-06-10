@@ -3,12 +3,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import layoutReducer from "./reducer/layout";
 import senderReducer from "./reducer/sender";
 import recipientReducer from "./reducer/recipient";
+import templateReducer from "./reducer/template";
 
 const store = configureStore({
   reducer: {
     layout: layoutReducer,
     sender: senderReducer,
     recipient: recipientReducer,
+    template: templateReducer,
   },
 });
 
