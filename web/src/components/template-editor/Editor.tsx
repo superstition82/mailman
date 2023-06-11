@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Quill from "quill";
 import ImageUploader from "quill-image-uploader";
 import ImageResize from "quill-image-resize";
-import "quill/dist/quill.bubble.css";
+import "quill/dist/quill.snow.css";
 import "quill-image-uploader/dist/quill.imageUploader.min.css";
 import "../../less/editor.less";
 
@@ -30,7 +30,7 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
 
   useEffect(() => {
     quillInstance.current = new Quill(quillElement.current!, {
-      theme: "bubble",
+      theme: "snow",
       formats: [
         "header",
         "bold",
@@ -98,7 +98,7 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
         value={title}
       />
       <div className="editor-wrapper">
-        <div ref={quillElement} />
+        <div className="editor" ref={quillElement} />
       </div>
     </div>
   );

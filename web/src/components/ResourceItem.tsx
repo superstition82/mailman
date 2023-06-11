@@ -16,7 +16,8 @@ function ResourceItem({ resource }: Props) {
           rel="noopener noreferrer"
           href={`/o/r/${resource.id}/${resource.filename}`}
         >
-          {resource.filename}
+          {resource.filename} (
+          {new Date(resource.createdTs * 1000).toLocaleTimeString()})
         </a>
       </span>
       <div className="col-span-1 w-full flex flex-row justify-end items-center pr-2">
