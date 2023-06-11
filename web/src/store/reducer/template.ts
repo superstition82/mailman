@@ -47,7 +47,7 @@ const templateSlice = createSlice({
     deleteBulkTemplate: (state, action: PayloadAction<TemplateId[]>) => {
       return {
         ...state,
-        recipients: state.templates.filter((template) => {
+        templates: state.templates.filter((template) => {
           return !action.payload.includes(template.id);
         }),
       };

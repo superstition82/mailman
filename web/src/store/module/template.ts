@@ -7,7 +7,6 @@ import {
   upsertTemplates,
   setIsFetching,
 } from "../reducer/template";
-import { omit } from "lodash-es";
 
 export const useTemplateStore = () => {
   const state = useAppSelector((state) => state.template);
