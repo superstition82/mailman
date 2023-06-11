@@ -42,7 +42,7 @@ function SenderManagementForm() {
       <div className="w-full flex items-center">
         <p className="flex flex-row justify-start items-center select-none rounded">
           <Icon.UserCircle className="mr-3 w-6 h-auto opacity-70" />
-          발신자 관리 ({senders.length}개)
+          발신자 관리 ({senders.length} 계정)
         </p>
         <div className="p-2 flex flex-1 justify-end gap-1">
           <button className="w-12 px-4" type="submit">

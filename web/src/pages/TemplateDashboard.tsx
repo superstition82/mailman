@@ -8,7 +8,7 @@ function TemplateDashboard() {
         <div className="w-full flex items-center mb-4">
           <p className="flex flex-row justify-start items-center select-none rounded pt-2">
             <Icon.Hash className="mr-3 w-6 h-auto opacity-70" />
-            이메일
+            템플릿
           </p>
         </div>
         <TemplateManagementTable />

@@ -11,7 +11,11 @@ function ResourceItem({ resource }: Props) {
         {resource.id}
       </span>
       <span className="col-span-6 w-full m-auto truncate text-base pr-2 hover:opacity-30">
-        <a href={`/o/r/${resource.id}/${resource.filename}`}>
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`/o/r/${resource.id}/${resource.filename}`}
+        >
           {resource.filename}
         </a>
       </span>

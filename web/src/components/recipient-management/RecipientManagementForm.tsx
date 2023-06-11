@@ -33,7 +33,7 @@ function RecipientManagementForm() {
       <div className="w-full flex items-center">
         <p className="flex flex-row justify-start items-center select-none rounded pt-2">
           <Icon.UserPlus className="mr-3 w-6 h-auto opacity-70" />
-          수신자 관리 ({recipients.length}개)
+          수신자 관리 ({recipients.length} 계정)
         </p>
       </div>
       <div className="w-full flex mt-4 bg-white rounded-sm">

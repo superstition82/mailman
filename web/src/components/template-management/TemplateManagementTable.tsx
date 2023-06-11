@@ -74,7 +74,7 @@ function TemplateManagementTable() {
                 />
               </th>
               <th>제목</th>
-              <th>수정일자</th>
+              <th>생성일자</th>
             </tr>
           )}
           itemContent={(_, template) => (
@@ -85,12 +85,12 @@ function TemplateManagementTable() {
                   sx={{ verticalAlign: "top" }}
                 />
               </td>
-              <td>
+              <td className="underline ">
                 <NavLink to={`/write?id=${template.id}`}>
                   {template.subject}
                 </NavLink>
               </td>
-              <td>{new Date(template.updatedTs * 1000).toLocaleString()}</td>
+              <td>{new Date(template.createdTs * 1000).toLocaleString()}</td>
             </>
           )}
         />
