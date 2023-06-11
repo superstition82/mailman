@@ -6,8 +6,8 @@ import { App } from "./App.tsx";
 import store from "./store/index.ts";
 import theme from "./theme/index.ts";
 
-import "./styles/global.css";
-import "./styles/tailwind.css";
+import "./css/global.css";
+import "./css/tailwind.css";
 
 const container = document.getElementById("root");
 const root = ReactDOM.createRoot(container as HTMLElement);

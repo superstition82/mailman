@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "../styles/not-found.less";
+import "../less/not-found.less";
 
 function NotFound() {
   return (

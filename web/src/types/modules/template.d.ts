@@ -13,6 +13,12 @@ type TemplateCreate = {
   body: string;
 };
 
+type TemplatePatch = {
+  id: number;
+  subject?: string;
+  body?: string;
+};
+
 type TemplateFind = {
   offset?: number;
   limit?: number;

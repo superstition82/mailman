@@ -21,6 +21,21 @@ const templateSlice = createSlice({
         templates: state.templates.concat(action.payload),
       };
     },
+    patchTemplate: (state, action: PayloadAction<Partial<Template>>) => {
+      return {
+        ...state,
+        templates: state.templates.map((template) => {
+          if (template.id === action.payload.id) {
+            return {
+              ...template,
+              ...action.payload,
+            };
+          } else {
+            return template;
+          }
+        }),
+      };
+    },
     deleteTemplate: (state, action: PayloadAction<TemplateId>) => {
       return {
         ...state,
@@ -75,6 +90,7 @@ const templateSlice = createSlice({
 
 export const {
   createTemplate,
+  patchTemplate,
   deleteBulkTemplate,
   deleteTemplate,
   upsertTemplates,

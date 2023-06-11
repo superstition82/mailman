@@ -86,6 +86,13 @@ export function createTemplate(templateCreate: TemplateCreate) {
   return axios.post<ResponseObject<Template>>(`/api/template`, templateCreate);
 }
 
+export function patchTemplate(templatePatch: TemplatePatch) {
+  return axios.patch<ResponseObject<Template>>(
+    `/api/template/${templatePatch.id}`,
+    templatePatch
+  );
+}
+
 export function deleteTemplate(templateId: TemplateId) {
   return axios.delete(`/api/template/${templateId}`);
 }

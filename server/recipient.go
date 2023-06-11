@@ -127,8 +127,7 @@ func (server *Server) deleteBulkRecipient(c echo.Context) error {
 var (
 	verifier = emailverifier.
 		NewVerifier().
-		EnableSMTPCheck().
-		DisableCatchAllCheck()
+		EnableSMTPCheck()
 )
 
 func (server *Server) validateRecipient(c echo.Context) error {

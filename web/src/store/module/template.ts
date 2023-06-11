@@ -7,6 +7,7 @@ import {
   upsertTemplates,
   setIsFetching,
 } from "../reducer/template";
+import { omit } from "lodash-es";
 
 export const useTemplateStore = () => {
   const state = useAppSelector((state) => state.template);
@@ -39,12 +40,17 @@ export const useTemplateStore = () => {
       store.dispatch(createTemplate(data));
       return data;
     },
+    patchTemplate: async (templatePatch: TemplatePatch): Promise<Template> => {
+      const { data } = (await api.patchTemplate(templatePatch)).data;
+      store.dispatch(reducer.patchTemplate(data));
+      return data;
+    },
     deleteTemplateById: async (id: TemplateId) => {
       await api.deleteSender(id);
       store.dispatch(deleteTemplate(id));
     },
     deleteBulkTemplate: async (templateIds: TemplateId[]) => {
-      await api.deleteBulkSender(templateIds);
+      await api.deleteBulkTemplate(templateIds);
       store.dispatch(reducer.deleteBulkTemplate(templateIds));
     },
     toggleSelectAll: (checked: boolean) => {

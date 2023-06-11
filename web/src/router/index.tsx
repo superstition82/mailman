@@ -2,7 +2,8 @@ import { createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
 
 const Root = lazy(() => import("../layouts/Root"));
-const Home = lazy(() => import("../pages/TemplateDashboard"));
+const EmailDashboard = lazy(() => import("../pages/TemplateDashboard"));
+const TemplateWrite = lazy(() => import("../pages/TemplateWrite"));
 const SenderDashboard = lazy(() => import("../pages/SenderDashboard"));
 const RecipientDashboard = lazy(() => import("../pages/RecipientDashboard"));
 const ResourcesDashboard = lazy(() => import("../pages/ResourcesDashboard"));
@@ -15,8 +16,9 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <Home />,
+        element: <EmailDashboard />,
       },
+
       {
         path: "/sender",
         element: <SenderDashboard />,
@@ -30,6 +32,10 @@ export const router = createBrowserRouter([
         element: <ResourcesDashboard />,
       },
     ],
+  },
+  {
+    path: "/write",
+    element: <TemplateWrite />,
   },
   {
     path: "*",

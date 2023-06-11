@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { Button, Checkbox, Sheet, Table } from "@mui/joy";
+import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useTemplateStore } from "../../store/module/template";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import Icon from "../common/Icon";
 
 function TemplateManagementTable() {
@@ -50,7 +50,7 @@ function TemplateManagementTable() {
                     width: "40px",
                   },
                   "& thead th:nth-child(3)": {
-                    width: "90px",
+                    width: "240px",
                   },
                 }}
                 {...props}
@@ -74,7 +74,7 @@ function TemplateManagementTable() {
                 />
               </th>
               <th>제목</th>
-              <th></th>
+              <th>수정일자</th>
             </tr>
           )}
           itemContent={(_, template) => (
@@ -85,12 +85,12 @@ function TemplateManagementTable() {
                   sx={{ verticalAlign: "top" }}
                 />
               </td>
-              <td>{template.subject}</td>
               <td>
-                <Link to={`/template/${template.id}`}>
-                  <Button size="sm">수정하기</Button>
-                </Link>
+                <NavLink to={`/write?id=${template.id}`}>
+                  {template.subject}
+                </NavLink>
               </td>
+              <td>{new Date(template.updatedTs * 1000).toLocaleString()}</td>
             </>
           )}
         />
