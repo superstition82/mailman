@@ -11,7 +11,7 @@ import {
 export const useTemplateStore = () => {
   const state = useAppSelector((state) => state.template);
   const fetchTemplateById = async (id: TemplateId) => {
-    const { data } = (await api.getTemplateById(id)).data;
+    const { data } = (await api.findTemplateById(id)).data;
     return data;
   };
 
@@ -21,12 +21,12 @@ export const useTemplateStore = () => {
     fetchTemplates: async (limit?: number, offset?: number) => {
       store.dispatch(setIsFetching(true));
       const templateFind = { limit, offset };
-      const { data } = (await api.getTemplateList(templateFind)).data;
+      const { data } = (await api.findTemplateList(templateFind)).data;
       store.dispatch(upsertTemplates(data));
       store.dispatch(setIsFetching(false));
       return data;
     },
-    getTemplateById: async (templateId: TemplateId) => {
+    findTemplateById: async (templateId: TemplateId) => {
       for (const s of state.templates) {
         if (s.id === templateId) {
           return s;

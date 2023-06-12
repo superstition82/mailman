@@ -63,6 +63,10 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 
 	apiGroup := e.Group("/api")
 
+	// email endpoint
+	emailGroup := apiGroup.Group("/email")
+	emailGroup.POST("/send", s.sendEmail)
+
 	// recipient endpoint
 	recipientGroup := apiGroup.Group("/recipient")
 	recipientGroup.POST("", s.createRecipient)
@@ -86,7 +90,7 @@ func NewServer(ctx context.Context, config *config.Config) (*Server, error) {
 	templateGroup := apiGroup.Group("/template")
 	templateGroup.POST("", s.createTemplate)
 	templateGroup.GET("", s.findTemplateList)
-	templateGroup.GET("/:templateId", s.getTemplate)
+	templateGroup.GET("/:templateId", s.findTemplate)
 	templateGroup.PATCH("/:templateId", s.updateTemplate)
 	templateGroup.DELETE("/:templateId", s.deleteTemplate)
 	templateGroup.POST("/bulk-delete", s.deleteBulkTemplate)

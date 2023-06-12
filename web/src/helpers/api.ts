@@ -69,7 +69,7 @@ export function validateRecipient(recipientId: RecipientId) {
   );
 }
 
-export function getTemplateList(templateFind?: TemplateFind) {
+export function findTemplateList(templateFind?: TemplateFind) {
   return axios.get<ResponseObject<Template[]>>(`/api/template`, {
     params: {
       offset: templateFind?.offset,
@@ -78,7 +78,7 @@ export function getTemplateList(templateFind?: TemplateFind) {
   });
 }
 
-export function getTemplateById(templateId: TemplateId) {
+export function findTemplateById(templateId: TemplateId) {
   return axios.get<ResponseObject<Template>>(`/api/template/${templateId}`);
 }
 

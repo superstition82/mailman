@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"mails/store"
 	"net/http"
 	"strconv"
@@ -10,8 +11,12 @@ import (
 )
 
 type createTemplateRequestBody struct {
+	// Domain specific fields
 	Subject string `json:"subject"`
 	Body    string `json:"body"`
+
+	// Related fields
+	ResourceIDList []int `json:"resourceIdList"`
 }
 
 func (server *Server) createTemplate(c echo.Context) error {
@@ -24,6 +29,8 @@ func (server *Server) createTemplate(c echo.Context) error {
 		})
 	}
 
+	log.Println(body)
+
 	createTemplateParams := store.TemplateCreate{
 		Subject: body.Subject,
 		Body:    body.Body,
@@ -33,6 +40,23 @@ func (server *Server) createTemplate(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
 		})
+	}
+
+	for _, resourceID := range body.ResourceIDList {
+		log.Println(resourceID)
+		if _, err := server.store.UpsertTemplateResource(ctx, &store.TemplateResourceUpsert{
+			TemplateID: template.ID,
+			ResourceID: resourceID,
+		}); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to upsert template resource").SetInternal(err)
+		}
+	}
+
+	template, err = server.store.FindTemplate(ctx, &store.TemplateFind{
+		ID: &template.ID,
+	})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to compose template").SetInternal(err)
 	}
 
 	return c.JSON(http.StatusOK, &okResponse{
@@ -55,7 +79,7 @@ func (server *Server) findTemplateList(c echo.Context) error {
 	})
 }
 
-func (server *Server) getTemplate(c echo.Context) error {
+func (server *Server) findTemplate(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	templateId, err := strconv.Atoi(c.Param("templateId"))

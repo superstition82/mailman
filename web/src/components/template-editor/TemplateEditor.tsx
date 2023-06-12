@@ -21,7 +21,7 @@ function TemplateEditor({ templateId, className }: Props) {
   useEffect(() => {
     if (templateId) {
       templateStore
-        .getTemplateById(templateId)
+        .findTemplateById(templateId)
         .then((template) => {
           if (template) {
             setSubject(template.subject);

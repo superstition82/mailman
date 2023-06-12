@@ -7,6 +7,7 @@ const TemplateWrite = lazy(() => import("../pages/TemplateWrite"));
 const SenderDashboard = lazy(() => import("../pages/SenderDashboard"));
 const RecipientDashboard = lazy(() => import("../pages/RecipientDashboard"));
 const ResourcesDashboard = lazy(() => import("../pages/ResourcesDashboard"));
+const CampaignDashboard = lazy(() => import("../pages/CampaignDashboard"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 export const router = createBrowserRouter([
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: "/resource",
         element: <ResourcesDashboard />,
+      },
+      {
+        path: "/campaign",
+        element: <CampaignDashboard />,
       },
     ],
   },

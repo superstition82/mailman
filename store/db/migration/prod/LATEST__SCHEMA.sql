@@ -64,7 +64,5 @@ CREATE TABLE template_resource (
   resource_id INTEGER NOT NULL,
   created_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
   updated_ts BIGINT NOT NULL DEFAULT (strftime('%s', 'now')),
-  FOREIGN KEY (template_id) REFERENCES template(id),
-  FOREIGN KEY (resource_id) REFERENCES resource(id),
   UNIQUE(template_id, resource_id)
 );

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -18,6 +19,9 @@ type Template struct {
 	// Domain specific fields
 	Subject string `json:"subject"`
 	Body    string `json:"body"`
+
+	// Composed fields
+	ResourceIDList []int `json:"resourceIdList"`
 }
 
 type TemplateCreate struct {
@@ -25,7 +29,7 @@ type TemplateCreate struct {
 	Body    string
 }
 
-func (s *Store) CreateTemplate(ctx context.Context, create *TemplateCreate) (Template, error) {
+func (s *Store) CreateTemplate(ctx context.Context, create *TemplateCreate) (*Template, error) {
 	query := `
 		INSERT INTO template (subject, body)
 		VALUES ($1, $2)
@@ -46,7 +50,7 @@ func (s *Store) CreateTemplate(ctx context.Context, create *TemplateCreate) (Tem
 		&template.CreatedTs,
 		&template.UpdatedTs,
 	)
-	return template, err
+	return &template, err
 }
 
 type TemplateFind struct {
@@ -63,15 +67,21 @@ func (s *Store) FindTemplateList(ctx context.Context, find *TemplateFind) ([]*Te
 	if v := find.ID; v != nil {
 		where, args = append(where, "template.id = ?"), append(args, *v)
 	}
-	fields := []string{"id", "subject", "body", "created_ts", "updated_ts"}
 	query := fmt.Sprintf(`
 		SELECT 
-			%s
+			template.id AS id,
+			template.created_ts AS created_ts,
+			template.updated_ts AS updated_ts,
+			template.subject AS subject,
+			template.body AS body,
+			GROUP_CONCAT(template_resource.resource_id) AS resource_id_list
 		FROM template
+		LEFT JOIN
+			template_resource ON template.id = template_resource.template_id
 		WHERE %s
-		GROUP BY id
+		GROUP BY template.id
 		ORDER BY id DESC
-	`, strings.Join(fields, ", "), strings.Join(where, " AND "))
+	`, strings.Join(where, " AND "))
 	if find.Limit != nil {
 		query = fmt.Sprintf("%s LIMIT %d", query, *find.Limit)
 		if find.Offset != nil {
@@ -88,15 +98,28 @@ func (s *Store) FindTemplateList(ctx context.Context, find *TemplateFind) ([]*Te
 	templateList := make([]*Template, 0)
 	for rows.Next() {
 		var template Template
+		var templateResourceIDList sql.NullString
 		dests := []any{
 			&template.ID,
-			&template.Subject,
-			&template.Body,
 			&template.CreatedTs,
 			&template.UpdatedTs,
+			&template.Subject,
+			&template.Body,
+			&templateResourceIDList,
 		}
 		if err := rows.Scan(dests...); err != nil {
 			return nil, err
+		}
+		if templateResourceIDList.Valid {
+			idStringList := strings.Split(templateResourceIDList.String, ",")
+			template.ResourceIDList = make([]int, 0, len(idStringList))
+			for _, idString := range idStringList {
+				id, err := strconv.Atoi(idString)
+				if err != nil {
+					return nil, err
+				}
+				template.ResourceIDList = append(template.ResourceIDList, id)
+			}
 		}
 		templateList = append(templateList, &template)
 	}

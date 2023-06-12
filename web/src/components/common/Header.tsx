@@ -54,7 +54,7 @@ function Header() {
             </NavLink>
             <NavLink
               to="/sender"
-              id="header-home"
+              id="header-sender"
               className={({ isActive }) =>
                 `${
                   isActive && "bg-white shadow"
@@ -68,7 +68,7 @@ function Header() {
             </NavLink>
             <NavLink
               to="/recipient"
-              id="header-review"
+              id="header-recipient"
               className={({ isActive }) =>
                 `${
                   isActive && "bg-white shadow"
@@ -80,6 +80,21 @@ function Header() {
                 수신자 관리
               </>
             </NavLink>
+            <NavLink
+              to="/campaign"
+              id="header-campaign"
+              className={({ isActive }) =>
+                `${
+                  isActive && "bg-white shadow"
+                } w-full px-4 pr-5 py-2 rounded-2xl flex flex-row items-center text-lg text-gray-800 hover:bg-white hover:shadow`
+              }
+            >
+              <>
+                <Icon.Send className="mr-3 w-6 h-auto opacity-70" />
+                이메일 발송
+              </>
+            </NavLink>
+
             <NavLink
               to="/resource"
               id="header-resources"
@@ -99,14 +114,6 @@ function Header() {
                 className="mt-2 w-full py-3 rounded-full flex flex-row justify-center items-center bg-zinc-600 font-medium text-white dark:opacity-80 hover:shadow hover:opacity-90"
               >
                 <Icon.Edit3 className="w-4 h-auto mr-1" /> 템플릿 작성
-              </NavLink>
-            </div>
-            <div className="pr-3 pl-1 w-full">
-              <NavLink
-                to="/write"
-                className="mt-2 w-full py-3 rounded-full flex flex-row justify-center items-center bg-zinc-600 font-medium text-white dark:opacity-80 hover:shadow hover:opacity-90"
-              >
-                <Icon.Send className="w-4 h-auto mr-1" /> 이메일 발송
               </NavLink>
             </div>
           </>
