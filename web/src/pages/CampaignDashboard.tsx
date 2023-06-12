@@ -1,12 +1,27 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Sheet, Table, Input, FormLabel } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import Icon from "../components/common/Icon";
-import { useMailman } from "../hooks/useMailman";
+import { useLoading } from "../hooks/useLoading";
 
 function CampaignDashboard() {
-  const {} = useMailman();
+  const {} = useLoading();
   const [logs, setLogs] = useState([]);
+  const [setting, setSetting] = useState({
+    random: true,
+    bundle: 1,
+    waitTime: 2000,
+  });
+
+  const handleChangeInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSetting((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    },
+    [setSetting]
+  );
 
   return (
     <section className="w-full max-w-3xl min-h-full flex flex-col justify-start items-center px-4 sm:px-2 sm:pt-4 pb-8 bg-zinc-100">
@@ -50,8 +65,8 @@ function CampaignDashboard() {
                 )}
                 itemContent={(_, log) => (
                   <>
-                    <td>{new Date(log.createdAt).toLocaleTimeString()}</td>
-                    <td className="break-words">{log.content}</td>
+                    <td>시간</td>
+                    <td className="break-words">{log}</td>
                   </>
                 )}
               />
@@ -77,7 +92,7 @@ function CampaignDashboard() {
                     type="number"
                     name="bundle"
                     value={setting.bundle}
-                    onChange={handleChange}
+                    onChange={handleChangeInput}
                     aria-label="개"
                   />
 
@@ -89,19 +104,19 @@ function CampaignDashboard() {
                     type="number"
                     name="waitTime"
                     value={setting.waitTime}
-                    onChange={handleChange}
+                    onChange={handleChangeInput}
                     aria-label="초(ms)"
                   />
 
                   <button
                     className="px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold rounded"
-                    onClick={() => handleSendMail({ isBcc: true })}
+                    onClick={() => {}}
                   >
                     메일 발송
                   </button>
                   <button
                     className="px-3 py-1 bg-blue-500 hover:bg-blue-700 text-white text-sm font-bold rounded"
-                    onClick={() => handleSendMail({ isBcc: false })}
+                    onClick={() => {}}
                   >
                     숨은참조 발송
                   </button>

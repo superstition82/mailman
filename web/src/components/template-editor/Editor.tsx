@@ -33,6 +33,11 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
       theme: "snow",
       formats: [
         "header",
+        "alt",
+        "height",
+        "width",
+        "font",
+        "size",
         "bold",
         "italic",
         "underline",
@@ -43,15 +48,37 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
         "indent",
         "link",
         "image",
-        "imageBlot",
+        "color",
+        "size",
+        "video",
+        "align",
+        "background",
+        "direction",
+        "code-block",
+        "code",
       ],
       modules: {
         toolbar: {
           container: [
-            [{ header: "1" }, { header: "2" }],
+            [
+              {
+                size: ["small", false, "large", "huge"],
+              },
+              {
+                color: [],
+              },
+            ],
             ["bold", "italic", "underline", "strike"],
-            [{ list: "ordered" }, { list: "bullet" }],
+            [
+              {
+                list: "ordered",
+              },
+              {
+                list: "bullet",
+              },
+            ],
             ["blockquote", "code-block", "link", "image"],
+            ["bold", "italic", "underline", "strike", "blockquote"],
           ],
         },
         imageUploader: {
@@ -80,6 +107,7 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
     quill.on("text-change", (delta, oldDelta, source) => {
       if (source === "user") {
         onChangeBody(quill.root.innerHTML);
+        console.log(quill.root.innerHTML);
       }
     });
   }, [onChangeBody]);

@@ -1,19 +1,17 @@
 import toast from "react-hot-toast";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { Checkbox, Sheet, Table } from "@mui/joy";
 import { TableVirtuoso } from "react-virtuoso";
 import { useRecipientStore } from "../../store/module/recipient";
 import Icon from "../common/Icon";
 import Progress from "../common/Progress";
+import { useLoading } from "../../hooks/useLoading";
 
 function RecipientManagementTable() {
   const recipientStore = useRecipientStore();
   const { recipients, selectedIds } = recipientStore.state;
-  const [progress, setProgress] = useState({
-    isLoading: false,
-    current: 0,
-    total: 0,
-  });
+  const { progress, isLoading, setStart, setNextTick, setFinish } =
+    useLoading();
 
   useEffect(() => {
     recipientStore.fetchRecipients().catch((error) => {
@@ -43,31 +41,17 @@ function RecipientManagementTable() {
   };
 
   const handleValidate = useCallback(async () => {
-    setProgress({
-      current: 0,
-      total: selectedIds.length,
-      isLoading: true,
-    });
+    setStart(selectedIds.length);
     for (const selected of selectedIds) {
-      setProgress((prev) => ({
-        ...prev,
-        current: prev.current + 1,
-      }));
+      setNextTick();
       await recipientStore.validate(selected);
     }
-    setProgress((prev) => ({
-      ...prev,
-      isLoading: false,
-    }));
-  }, [selectedIds, setProgress]);
-
-  if (progress.isLoading) {
-    const { current, total } = progress;
-    return <Progress current={current} total={total} />;
-  }
+    setFinish();
+  }, [progress, selectedIds, setStart, setNextTick, setFinish]);
 
   return (
     <div className="flex flex-col rounded-sm px-2 mb-8 bg-white">
+      {isLoading ? <Progress value={progress} /> : <></>}
       <Sheet
         sx={{
           "--TableCell-height": "40px",

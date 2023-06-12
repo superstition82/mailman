@@ -17,6 +17,7 @@ function TemplateEditor({ templateId, className }: Props) {
 
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+  const [resourceIdList, setResourceIdList] = useState<ResourceId[]>([]);
 
   useEffect(() => {
     if (templateId) {
@@ -26,6 +27,7 @@ function TemplateEditor({ templateId, className }: Props) {
           if (template) {
             setSubject(template.subject);
             setBody(template.body);
+            setResourceIdList(template.resourceIdList);
           }
         })
         .catch((error) => {
@@ -36,7 +38,10 @@ function TemplateEditor({ templateId, className }: Props) {
   }, [templateId]);
 
   const handleUploadImage = async (file: File) => {
-    return resourceStore.createResourceWithBlob(file);
+    const resource = await resourceStore.createResourceWithBlob(file);
+    setResourceIdList((prev) => [...prev, resource.id]);
+
+    return resource;
   };
 
   const handleOnPublish = async () => {
@@ -45,11 +50,13 @@ function TemplateEditor({ templateId, className }: Props) {
         id: templateId,
         subject,
         body,
+        resourceIdList,
       });
     } else {
       await templateStore.createTemplate({
         subject,
         body,
+        resourceIdList,
       });
     }
     navigate("/"); // home
