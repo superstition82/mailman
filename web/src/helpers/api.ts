@@ -131,3 +131,19 @@ export function createResourceWithBlob(formData: FormData) {
 export function deleteResourceById(id: ResourceId) {
   return axios.delete(`/api/resource/${id}`);
 }
+
+type EmailSend = {
+  template: number;
+  sender: number;
+  recipients: number[];
+  bcc: number[];
+};
+
+export function sendEmail({ template, sender, recipients, bcc }: EmailSend) {
+  return axios.post<string>(`/api/email/send`, {
+    template,
+    sender,
+    recipients,
+    bcc,
+  });
+}

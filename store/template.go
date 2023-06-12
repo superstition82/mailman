@@ -75,7 +75,8 @@ func (s *Store) FindTemplateList(ctx context.Context, find *TemplateFind) ([]*Te
 			template.subject AS subject,
 			template.body AS body,
 			GROUP_CONCAT(template_resource.resource_id) AS resource_id_list
-		FROM template
+		FROM 
+			template
 		LEFT JOIN
 			template_resource ON template.id = template_resource.template_id
 		WHERE %s
@@ -123,7 +124,6 @@ func (s *Store) FindTemplateList(ctx context.Context, find *TemplateFind) ([]*Te
 		}
 		templateList = append(templateList, &template)
 	}
-
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}

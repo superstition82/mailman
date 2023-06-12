@@ -71,10 +71,16 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
             ["bold", "italic", "underline", "strike"],
             [
               {
-                list: "ordered",
+                align: "",
               },
               {
-                list: "bullet",
+                align: "center",
+              },
+              {
+                align: "right",
+              },
+              {
+                align: "justify",
               },
             ],
             ["blockquote", "code-block", "link", "image"],
@@ -86,12 +92,11 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
             return new Promise((resolve, reject) => {
               onUpload(file)
                 .then((resource) => {
-                  console.log("resource: ", resource);
                   resolve(`/o/r/${resource.id}/${resource.filename}`);
                 })
                 .catch((error) => {
-                  reject("Upload failed");
                   console.error("Error:", error);
+                  reject("Upload failed");
                 });
             });
           },
@@ -107,7 +112,6 @@ function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
     quill.on("text-change", (delta, oldDelta, source) => {
       if (source === "user") {
         onChangeBody(quill.root.innerHTML);
-        console.log(quill.root.innerHTML);
       }
     });
   }, [onChangeBody]);

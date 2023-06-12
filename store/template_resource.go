@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"errors"
 	"strings"
 )
 
@@ -48,4 +49,33 @@ func (s *Store) UpsertTemplateResource(ctx context.Context, upsert *TemplateReso
 	}
 
 	return &templateResource, nil
+}
+
+type TemplateResourceDelete struct {
+	TemplateID *int
+	ResourceID *int
+}
+
+func (s *Store) DeleteTemplateResource(ctx context.Context, delete *TemplateResourceDelete) error {
+	where, args := []string{}, []any{}
+
+	if v := delete.TemplateID; v != nil {
+		where, args = append(where, "template_id = ?"), append(args, *v)
+	}
+	if v := delete.ResourceID; v != nil {
+		where, args = append(where, "resource_id = ?"), append(args, *v)
+	}
+
+	stmt := `DELETE FROM template_resource WHERE ` + strings.Join(where, " AND ")
+	result, err := s.db.ExecContext(ctx, stmt, args...)
+	if err != nil {
+		return err
+	}
+
+	rows, _ := result.RowsAffected()
+	if rows == 0 {
+		return errors.New("template resource not found")
+	}
+
+	return nil
 }

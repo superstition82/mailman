@@ -18,7 +18,7 @@ const recipientSlice = createSlice({
     createRecipient: (state, action: PayloadAction<Recipient>) => {
       return {
         ...state,
-        recipients: state.recipients.concat(action.payload),
+        recipients: [action.payload, ...state.recipients],
       };
     },
     deleteRecipient: (state, action: PayloadAction<RecipientId>) => {

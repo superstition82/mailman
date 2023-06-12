@@ -27,7 +27,7 @@ function TemplateEditor({ templateId, className }: Props) {
           if (template) {
             setSubject(template.subject);
             setBody(template.body);
-            setResourceIdList(template.resourceIdList);
+            setResourceIdList(template.resourceIdList ?? []);
           }
         })
         .catch((error) => {

@@ -1,17 +1,23 @@
 package server
 
 import (
-	"log"
+	"fmt"
+	"io/ioutil"
 	"mails/store"
 	"net/http"
+	"os"
+	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/labstack/echo/v4"
+	"gopkg.in/gomail.v2"
 )
 
 type sendEmailRequestBody struct {
 	Template   int   `json:"template"`
 	Sender     int   `json:"sender"`
 	Recipients []int `json:"recipients"`
+	BCC        []int `json:"bcc"`
 }
 
 func (server *Server) sendEmail(c echo.Context) error {
@@ -42,7 +48,7 @@ func (server *Server) sendEmail(c echo.Context) error {
 		})
 	}
 
-	recipients := make([]*store.Recipient, 0)
+	to := make([]string, 0)
 	for _, recipientID := range body.Recipients {
 		recipient, err := server.store.FindRecipient(ctx, &store.RecipientFind{
 			ID: &recipientID,
@@ -52,10 +58,91 @@ func (server *Server) sendEmail(c echo.Context) error {
 				Message: "recipient not found",
 			})
 		}
-		recipients = append(recipients, recipient)
+		to = append(to, recipient.Email)
 	}
 
-	log.Println(sender, recipients, template)
+	bcc := make([]string, 0)
+	for _, recipientID := range body.BCC {
+		recipient, err := server.store.FindRecipient(ctx, &store.RecipientFind{
+			ID: &recipientID,
+		})
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, &errorResponse{
+				Message: "recipient not found",
+			})
+		}
+		bcc = append(bcc, recipient.Email)
+	}
 
-	return c.JSON(http.StatusOK, &okResponse{})
+	attachments := make([]string, 0)
+	for _, resourceID := range template.ResourceIDList {
+		resource, err := server.store.FindResource(ctx, &store.ResourceFind{
+			ID:      &resourceID,
+			GetBlob: true,
+		})
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, &errorResponse{
+				Message: "resource not found",
+			})
+		}
+		err = ioutil.WriteFile(resource.Filename, resource.Blob, 0644)
+		if err != nil {
+			fmt.Println("Error saving image file:", err)
+			return c.String(http.StatusInternalServerError, "Failed to generate a file")
+		}
+		defer os.Remove(resource.Filename)
+		attachments = append(attachments, resource.Filename)
+	}
+
+	m := gomail.NewMessage()
+	m.SetHeader("From", sender.Email)
+	m.SetHeader("To", to...)
+	m.SetHeader("Bcc", bcc...)
+	m.SetHeader("Subject", template.Subject)
+	modified, err := transformPathToCID(template.Body)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: err.Error(),
+		})
+	}
+	m.SetBody("text/html", modified)
+	for _, embed := range attachments {
+		m.Embed(embed)
+	}
+
+	d := gomail.NewDialer(sender.Host, sender.Port, sender.Email, sender.Password)
+	if err := d.DialAndSend(m); err != nil {
+		return c.JSON(http.StatusBadRequest, &errorResponse{
+			Message: err.Error(),
+		})
+	}
+
+	return c.String(
+		http.StatusOK,
+		fmt.Sprintf("[%s → %s (%s)] %s", sender.Email, strings.Join(to, ", "), strings.Join(bcc, ", "), template.Subject))
+}
+
+func transformPathToCID(html string) (string, error) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+	if err != nil {
+		fmt.Println("Failed to parse HTML:", err)
+		return "", err
+	}
+
+	doc.Find("img").Each(func(i int, s *goquery.Selection) {
+		src, _ := s.Attr("src")
+		if strings.HasPrefix(src, "/o/r/") {
+			fileName := src[strings.LastIndex(src, "/")+1:]
+			cidSrc := fmt.Sprintf("cid:%s", fileName)
+			s.SetAttr("src", cidSrc)
+		}
+	})
+
+	emailHTML, err := doc.Html()
+	if err != nil {
+		fmt.Println("Failed to convert document back to HTML:", err)
+		return "", err
+	}
+
+	return emailHTML, nil
 }

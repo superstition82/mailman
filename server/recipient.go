@@ -251,7 +251,7 @@ func (server *Server) exportRecipientsToFile(c echo.Context) error {
 		})
 	}
 
-	c.Response().Header().Set("Content-Disposition", "attachment; filename=customers.txt")
+	c.Response().Header().Set("Content-Disposition", "attachment; filename=고객이메일.txt")
 	c.Response().Header().Set("Content-Type", "text/plain")
 
 	return c.File(file.Name())
