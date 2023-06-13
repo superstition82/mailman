@@ -22,7 +22,7 @@ var (
 	data   string
 
 	rootCmd = &cobra.Command{
-		Use:   "mails",
+		Use:   "mailman",
 		Short: `이메일 검증, 이메일 템플릿 관리, 발송 기능을 지원하는 웹 서비스입니다`,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -101,7 +101,7 @@ func Execute() error {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "demo", `mode of server, can be "prod" or "dev" or "demo"`)
+	rootCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "prod", `mode of server, can be "prod" or "dev" or "demo"`)
 	rootCmd.PersistentFlags().IntVarP(&port, "port", "p", 8081, "port of server")
 	rootCmd.PersistentFlags().StringVarP(&data, "data", "d", "", "data directory")
 
@@ -118,7 +118,7 @@ func init() {
 		panic(err)
 	}
 
-	viper.SetDefault("mode", "demo")
+	viper.SetDefault("mode", "prod")
 	viper.SetDefault("port", 8081)
 	viper.SetEnvPrefix("memos")
 

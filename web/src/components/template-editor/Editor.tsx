@@ -5,6 +5,36 @@ import ImageResize from "quill-image-resize";
 import "react-quill/dist/quill.snow.css";
 import "../../less/editor.less";
 
+// image format for retrieving custom attributes
+const Parchment = Quill.import("parchment");
+
+const BaseImageFormat = Quill.import("formats/image");
+const ImageFormatAttributesList = ["alt", "height", "width", "style"];
+
+class ImageFormat extends BaseImageFormat {
+  static formats(domNode) {
+    return ImageFormatAttributesList.reduce(function (formats, attribute) {
+      if (domNode.hasAttribute(attribute)) {
+        formats[attribute] = domNode.getAttribute(attribute);
+      }
+      return formats;
+    }, {});
+  }
+  format(name, value) {
+    if (ImageFormatAttributesList.indexOf(name) > -1) {
+      if (value) {
+        this.domNode.setAttribute(name, value);
+      } else {
+        this.domNode.removeAttribute(name);
+      }
+    } else {
+      super.format(name, value);
+    }
+  }
+}
+
+Quill.register(ImageFormat, true);
+
 Quill.register("modules/imageUploader", ImageUploader);
 Quill.register("modules/ImageResize", ImageResize);
 
@@ -53,7 +83,7 @@ const Editor = forwardRef<Ref, Props>(function Editor(props, ref) {
         ],
       },
       ImageResize: {
-        parchment: Quill.import("parchment"),
+        parchment: Parchment,
       },
       imageUploader: {
         upload: handleUpload,
@@ -62,42 +92,11 @@ const Editor = forwardRef<Ref, Props>(function Editor(props, ref) {
     []
   );
 
-  const formats = useMemo(
-    () => [
-      "header",
-      "alt",
-      "height",
-      "width",
-      "font",
-      "size",
-      "bold",
-      "italic",
-      "underline",
-      "strike",
-      "blockquote",
-      "list",
-      "bullet",
-      "indent",
-      "link",
-      "image",
-      "color",
-      "size",
-      "video",
-      "align",
-      "background",
-      "direction",
-      "code-block",
-      "code",
-    ],
-    []
-  );
-
   return (
     <ReactQuill
       ref={ref}
       theme="snow"
       modules={modules}
-      formats={formats}
       value={body}
       onChange={handleChangeBody}
     />
