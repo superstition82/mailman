@@ -45,6 +45,11 @@ export const useRecipientStore = () => {
       store.dispatch(createRecipient(data));
       return data;
     },
+    importRecipientFile: async (file: File) => {
+      const { data } = (await api.importRecipientFile(file)).data;
+      data.forEach((recipient) => store.dispatch(createRecipient(recipient)));
+      return data;
+    },
     deleteRecipientById: async (recipientId: RecipientId) => {
       await api.deleteRecipient(recipientId);
       store.dispatch(deleteRecipient(recipientId));

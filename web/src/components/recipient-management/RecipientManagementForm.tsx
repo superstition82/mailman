@@ -1,10 +1,14 @@
 import { useCallback, useState } from "react";
 import { useRecipientStore } from "../../store/module/recipient";
 import Icon from "../common/Icon";
+import FilePicker from "../common/FilePicker";
+import { useLoading } from "../../hooks/useLoading";
+import Progress from "../common/Progress";
 
 function RecipientManagementForm() {
   const recipientStore = useRecipientStore();
   const { recipients } = recipientStore.state;
+  const { isLoading, setStart, setFinish } = useLoading();
   const [form, setForm] = useState({ email: "" });
 
   const handleChangeForm = useCallback(
@@ -17,24 +21,39 @@ function RecipientManagementForm() {
     [form, setForm]
   );
 
-  const handleSubmitForm = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      await recipientStore.createRecipient({
-        email: form.email,
-      });
-      setForm({ email: "" });
-    },
-    [form, setForm]
-  );
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await recipientStore.createRecipient({
+      email: form.email,
+    });
+    setForm({ email: "" });
+  };
+
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setStart();
+    await recipientStore.importRecipientFile(file);
+    setFinish();
+  };
 
   return (
     <form className="flex flex-wrap mb-4" onSubmit={handleSubmitForm}>
-      <div className="w-full flex items-center">
+      {isLoading ? <Progress /> : <></>}
+      <div className="w-full flex justify-between items-center">
         <p className="flex flex-row justify-start items-center select-none rounded pt-2">
-          <Icon.UserPlus className="mr-3 w-6 h-auto opacity-70" />
+          <Icon.UserPlus className="mr-2 w-6 h-auto opacity-70" />
           수신자 관리 ({recipients.length} 계정)
         </p>
+        <div className="flex flex-row justify-center items-center select-none pt-2">
+          <FilePicker
+            Icon={<Icon.FileUp className="mr-2 w-6 h-auto opacity-70" />}
+            onChange={handleUploadFile}
+          />
+          <a href="/api/recipient/file-export">
+            <Icon.FileDown className="mr-2 w-6 h-auto opacity-70" />
+          </a>
+        </div>
       </div>
       <div className="w-full flex mt-4 bg-white rounded-sm">
         <input

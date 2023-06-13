@@ -69,6 +69,25 @@ export function validateRecipient(recipientId: RecipientId) {
   );
 }
 
+export function importRecipientFile(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return axios.post<ResponseObject<Recipient[]>>(
+    `/api/recipient/file-import`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+}
+
+export function exportRecipientFile() {
+  return axios.get(`/api/recipient/file-export`, { responseType: "text" });
+}
+
 export function findTemplateList(templateFind?: TemplateFind) {
   return axios.get<ResponseObject<Template[]>>(`/api/template`, {
     params: {

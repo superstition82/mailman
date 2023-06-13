@@ -1,139 +1,107 @@
-import { useEffect, useRef } from "react";
-import Quill from "quill";
+import { forwardRef, useMemo } from "react";
+import ReactQuill, { Quill } from "react-quill";
 import ImageUploader from "quill-image-uploader";
 import ImageResize from "quill-image-resize";
-import "quill/dist/quill.snow.css";
-import "quill-image-uploader/dist/quill.imageUploader.min.css";
+import "react-quill/dist/quill.snow.css";
 import "../../less/editor.less";
 
 Quill.register("modules/imageUploader", ImageUploader);
 Quill.register("modules/ImageResize", ImageResize);
 
 type Props = {
-  title: string;
   body: string;
-  onChangeTitle: (value: string) => void;
   onChangeBody: (value: string) => void;
   onUpload: (file: File) => Promise<Resource>;
 };
 
-function Editor({ title, body, onChangeTitle, onChangeBody, onUpload }: Props) {
-  const quillElement = useRef<HTMLDivElement>(null);
-  const quillInstance = useRef<Quill | null>(null);
+type Ref = ReactQuill;
 
-  const mounted = useRef(false);
-  useEffect(() => {
-    if (mounted.current || !quillInstance.current) return;
-    mounted.current = true;
-    quillInstance.current.root.innerHTML = body;
-  }, [body]);
+const Editor = forwardRef<Ref, Props>(function Editor(props, ref) {
+  const { body, onChangeBody, onUpload } = props;
 
-  useEffect(() => {
-    quillInstance.current = new Quill(quillElement.current!, {
-      theme: "snow",
-      formats: [
-        "header",
-        "alt",
-        "height",
-        "width",
-        "font",
-        "size",
-        "bold",
-        "italic",
-        "underline",
-        "strike",
-        "blockquote",
-        "list",
-        "bullet",
-        "indent",
-        "link",
-        "image",
-        "color",
-        "size",
-        "video",
-        "align",
-        "background",
-        "direction",
-        "code-block",
-        "code",
-      ],
-      modules: {
-        toolbar: {
-          container: [
-            [
-              {
-                size: ["small", false, "large", "huge"],
-              },
-              {
-                color: [],
-              },
-            ],
-            ["bold", "italic", "underline", "strike"],
-            [
-              {
-                align: "",
-              },
-              {
-                align: "center",
-              },
-              {
-                align: "right",
-              },
-              {
-                align: "justify",
-              },
-            ],
-            ["blockquote", "code-block", "link", "image"],
-            ["bold", "italic", "underline", "strike", "blockquote"],
-          ],
-        },
-        imageUploader: {
-          upload: (file: File) => {
-            return new Promise((resolve, reject) => {
-              onUpload(file)
-                .then((resource) => {
-                  resolve(`/o/r/${resource.id}/${resource.filename}`);
-                })
-                .catch((error) => {
-                  console.error("Error:", error);
-                  reject("Upload failed");
-                });
-            });
-          },
-        },
-        ImageResize: {
-          parchment: Quill.import("parchment"),
-        },
-      },
-      placeholder: "본문을 작성하세요...",
+  const handleUpload = (file: File) => {
+    return new Promise((resolve, reject) => {
+      onUpload(file)
+        .then((resource) => {
+          resolve(`/o/r/${resource.id}/${resource.filename}`);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          reject("Upload failed");
+        });
     });
-
-    const quill = quillInstance.current;
-    quill.on("text-change", (delta, oldDelta, source) => {
-      if (source === "user") {
-        onChangeBody(quill.root.innerHTML);
-      }
-    });
-  }, [onChangeBody]);
-
-  const handleChangeTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChangeTitle(e.target.value);
   };
 
-  return (
-    <div className="editor-container px-4">
-      <input
-        type="text"
-        placeholder="제목"
-        className="title-input"
-        onChange={handleChangeTitle}
-        value={title}
-      />
-      <div className="editor-wrapper">
-        <div className="editor" ref={quillElement} />
-      </div>
-    </div>
+  const handleChangeBody = (value: string) => {
+    onChangeBody(value);
+  };
+
+  const modules = useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          [{ size: ["small", false, "large", "huge"] }, { color: [] }],
+          ["bold", "italic", "underline", "strike"],
+          [
+            { align: "" },
+            { align: "center" },
+            { align: "right" },
+            { align: "justify" },
+          ],
+          ["blockquote", "code-block", "link", "image"],
+          ["bold", "italic", "underline", "strike", "blockquote"],
+        ],
+      },
+      ImageResize: {
+        parchment: Quill.import("parchment"),
+      },
+      imageUploader: {
+        upload: handleUpload,
+      },
+    }),
+    []
   );
-}
+
+  const formats = useMemo(
+    () => [
+      "header",
+      "alt",
+      "height",
+      "width",
+      "font",
+      "size",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "blockquote",
+      "list",
+      "bullet",
+      "indent",
+      "link",
+      "image",
+      "color",
+      "size",
+      "video",
+      "align",
+      "background",
+      "direction",
+      "code-block",
+      "code",
+    ],
+    []
+  );
+
+  return (
+    <ReactQuill
+      ref={ref}
+      theme="snow"
+      modules={modules}
+      formats={formats}
+      value={body}
+      onChange={handleChangeBody}
+    />
+  );
+});
 
 export default Editor;

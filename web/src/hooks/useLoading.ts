@@ -15,12 +15,12 @@ export const useLoading = () => {
   return {
     ...state,
     progress,
-    setStart: (total: number) => {
+    setStart: (total?: number) => {
       setState({
         ...state,
         isLoading: true,
         count: 0,
-        total,
+        total: total ?? 0,
       });
     },
     setNextTick: () => {

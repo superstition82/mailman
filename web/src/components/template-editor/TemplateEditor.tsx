@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import ReactQuill from "react-quill";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Editor from "./Editor";
 import WriteActionButtons from "./WriteActionButtons";
@@ -11,6 +12,7 @@ type Props = {
 };
 
 function TemplateEditor({ templateId, className }: Props) {
+  const editorRef = useRef<ReactQuill>(null);
   const navigate = useNavigate();
   const templateStore = useTemplateStore();
   const resourceStore = useResourceStore();
@@ -62,21 +64,35 @@ function TemplateEditor({ templateId, className }: Props) {
     navigate("/"); // home
   };
 
+  const handleSubjectInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSubject(e.target.value);
+  };
+
   return (
     <div
       className={`${className} w-full max-w-3xl relative px-4 py-2 rounded-xl bg-white`}
     >
-      <Editor
-        title={subject}
-        body={body}
-        onChangeTitle={setSubject}
-        onChangeBody={setBody}
-        onUpload={handleUploadImage}
-      />
-      <WriteActionButtons
-        onPublish={handleOnPublish}
-        onCancel={() => navigate(-1)}
-      />
+      <div className="editor-container px-4">
+        <input
+          type="text"
+          placeholder="제목"
+          className="title-input"
+          value={subject}
+          onChange={handleSubjectInputChange}
+        />
+        <div className="editor-wrapper">
+          <Editor
+            ref={editorRef}
+            body={body}
+            onChangeBody={setBody}
+            onUpload={handleUploadImage}
+          />
+        </div>
+        <WriteActionButtons
+          onPublish={handleOnPublish}
+          onCancel={() => navigate(-1)}
+        />
+      </div>
     </div>
   );
 }
