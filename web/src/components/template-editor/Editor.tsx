@@ -5,11 +5,36 @@ import ImageResize from "quill-image-resize";
 import "react-quill/dist/quill.snow.css";
 import "../../less/editor.less";
 
-// image format for retrieving custom attributes
+const DirectionAttribute = Quill.import("attributors/attribute/direction");
+const AlignClass = Quill.import("attributors/class/align");
+const BackgroundClass = Quill.import("attributors/class/background");
+const ColorClass = Quill.import("attributors/class/color");
+const DirectionClass = Quill.import("attributors/class/direction");
+const FontClass = Quill.import("attributors/class/font");
+const SizeClass = Quill.import("attributors/class/size");
+const AlignStyle = Quill.import("attributors/style/align");
+const BackgroundStyle = Quill.import("attributors/style/background");
+const ColorStyle = Quill.import("attributors/style/color");
+const DirectionStyle = Quill.import("attributors/style/direction");
+const FontStyle = Quill.import("attributors/style/font");
+const SizeStyle = Quill.import("attributors/style/size");
 const Parchment = Quill.import("parchment");
-
 const BaseImageFormat = Quill.import("formats/image");
 const ImageFormatAttributesList = ["alt", "height", "width", "style"];
+
+Quill.register(DirectionAttribute, true);
+Quill.register(AlignClass, true);
+Quill.register(BackgroundClass, true);
+Quill.register(ColorClass, true);
+Quill.register(DirectionClass, true);
+Quill.register(FontClass, true);
+Quill.register(SizeClass, true);
+Quill.register(AlignStyle, true);
+Quill.register(BackgroundStyle, true);
+Quill.register(ColorStyle, true);
+Quill.register(DirectionStyle, true);
+Quill.register(FontStyle, true);
+Quill.register(SizeStyle, true);
 
 class ImageFormat extends BaseImageFormat {
   static formats(domNode) {

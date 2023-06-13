@@ -38,7 +38,7 @@ function RecipientManagementForm() {
   };
 
   return (
-    <form className="flex flex-wrap mb-4" onSubmit={handleSubmitForm}>
+    <div className="flex flex-wrap mb-4">
       {isLoading ? <Progress /> : <></>}
       <div className="w-full flex justify-between items-center">
         <p className="flex flex-row justify-start items-center select-none rounded pt-2">
@@ -55,7 +55,10 @@ function RecipientManagementForm() {
           </a>
         </div>
       </div>
-      <div className="w-full flex mt-4 bg-white rounded-sm">
+      <form
+        className="w-full flex mt-4 bg-white rounded-sm"
+        onSubmit={handleSubmitForm}
+      >
         <input
           className="py-2 px-2 w-full text-sm border rounded"
           value={form.email}
@@ -67,8 +70,8 @@ function RecipientManagementForm() {
         <button className="w-12 px-4" type="submit">
           <Icon.PlusSquare className="w-6 h-auto opacity-70" />
         </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 }
 

@@ -47,17 +47,19 @@ function TemplateEditor({ templateId, className }: Props) {
   };
 
   const handleOnPublish = async () => {
+    // https://github.com/quilljs/quill/issues/1328
+    const processedHtml = body.replace("<p><br></p>", "").trim();
     if (templateId) {
       await templateStore.patchTemplate({
         id: templateId,
         subject,
-        body,
+        body: processedHtml,
         resourceIdList,
       });
     } else {
       await templateStore.createTemplate({
         subject,
-        body,
+        body: processedHtml,
         resourceIdList,
       });
     }

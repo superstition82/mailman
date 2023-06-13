@@ -34,7 +34,7 @@ function RecipientManagementTable() {
 
   const handleDeleteUnreachable = async () => {
     const unreachableIds = recipients
-      .filter((recipient) => recipient.reachable == "no")
+      .filter((recipient) => recipient.reachable !== "yes")
       .map((recipient) => recipient.id);
 
     await recipientStore.deleteBulkRecipient(unreachableIds);
