@@ -8,6 +8,6 @@ cd "$(dirname "$0")/../"
 
 echo "Start building backend..."
 
-go build -o ./build/mails ./main.go
+go build -o ./build/mailman ./main.go
 
 echo "Backend built!"
