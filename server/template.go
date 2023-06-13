@@ -43,8 +43,8 @@ func (server *Server) createTemplate(c echo.Context) error {
 
 	for _, resourceID := range body.ResourceIDList {
 		if _, err := server.store.UpsertTemplateResource(ctx, &store.TemplateResourceUpsert{
-			TemplateID: template.ID,
-			ResourceID: resourceID,
+			TemplateID: &template.ID,
+			ResourceID: &resourceID,
 		}); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Failed to upsert template resource").SetInternal(err)
 		}
@@ -100,9 +100,11 @@ func (server *Server) findTemplate(c echo.Context) error {
 
 type patchTemplateRequest struct {
 	// Domain specific fields
-	Subject        *string `json:"subject"`
-	Body           *string `json:"body"`
-	ResourceIDList []int   `json:"resource_id_list"`
+	Subject *string `json:"subject"`
+	Body    *string `json:"body"`
+
+	// Related fields
+	ResourceIDList []int `json:"resourceIdList"`
 }
 
 func (server *Server) patchTemplate(c echo.Context) error {
@@ -140,10 +142,12 @@ func (server *Server) patchTemplate(c echo.Context) error {
 
 	if patchTemplateRequest.ResourceIDList != nil {
 		addedResourceIDList, removedResourceIDList := getIDListDiff(updatedTemplate.ResourceIDList, patchTemplateRequest.ResourceIDList)
+		fmt.Println("addedResourceIDList:", addedResourceIDList)
+		fmt.Println("removedResourceIDList:", removedResourceIDList)
 		for _, resourceID := range addedResourceIDList {
 			if _, err := server.store.UpsertTemplateResource(ctx, &store.TemplateResourceUpsert{
-				TemplateID: updatedTemplate.ID,
-				ResourceID: resourceID,
+				TemplateID: &updatedTemplate.ID,
+				ResourceID: &resourceID,
 			}); err != nil {
 				return echo.NewHTTPError(http.StatusInternalServerError, "Failed to upsert template resource").SetInternal(err)
 			}

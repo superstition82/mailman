@@ -14,8 +14,8 @@ type TemplateResource struct {
 }
 
 type TemplateResourceUpsert struct {
-	TemplateID int `json:"-"`
-	ResourceID int
+	TemplateID *int `json:"-"`
+	ResourceID *int
 	UpdatedTs  *int64
 }
 
