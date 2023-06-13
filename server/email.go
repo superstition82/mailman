@@ -10,6 +10,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/exp/slices"
 	"gopkg.in/gomail.v2"
 )
 
@@ -74,7 +75,7 @@ func (server *Server) sendEmail(c echo.Context) error {
 		bcc = append(bcc, recipient.Email)
 	}
 
-	attachments := make([]string, 0)
+	resources := make([]string, 0)
 	for _, resourceID := range template.ResourceIDList {
 		resource, err := server.store.FindResource(ctx, &store.ResourceFind{
 			ID:      &resourceID,
@@ -91,7 +92,7 @@ func (server *Server) sendEmail(c echo.Context) error {
 			return c.String(http.StatusInternalServerError, "Failed to generate a file")
 		}
 		defer os.Remove(resource.Filename)
-		attachments = append(attachments, resource.Filename)
+		resources = append(resources, resource.Filename)
 	}
 
 	m := gomail.NewMessage()
@@ -99,15 +100,17 @@ func (server *Server) sendEmail(c echo.Context) error {
 	m.SetHeader("To", to...)
 	m.SetHeader("Bcc", bcc...)
 	m.SetHeader("Subject", template.Subject)
-	modified, err := transformPathToCID(template.Body)
+	modified, embeds, err := composeEmailHTML(template.Body)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, &errorResponse{
 			Message: err.Error(),
 		})
 	}
 	m.SetBody("text/html", modified)
-	for _, embed := range attachments {
-		m.Embed(embed)
+	for _, embed := range embeds {
+		if slices.Contains(resources, embed) {
+			m.Embed(embed)
+		}
 	}
 
 	d := gomail.NewDialer(sender.Host, sender.Port, sender.Email, sender.Password)
@@ -122,27 +125,28 @@ func (server *Server) sendEmail(c echo.Context) error {
 		fmt.Sprintf("[%s → %s (%s)] %s", sender.Email, strings.Join(to, ", "), strings.Join(bcc, ", "), template.Subject))
 }
 
-func transformPathToCID(html string) (string, error) {
+func composeEmailHTML(html string) (modified string, embeds []string, err error) {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {
 		fmt.Println("Failed to parse HTML:", err)
-		return "", err
+		return
 	}
 
 	doc.Find("img").Each(func(i int, s *goquery.Selection) {
 		src, _ := s.Attr("src")
 		if strings.HasPrefix(src, "/o/r/") {
 			fileName := src[strings.LastIndex(src, "/")+1:]
+			embeds = append(embeds, fileName)
 			cidSrc := fmt.Sprintf("cid:%s", fileName)
 			s.SetAttr("src", cidSrc)
 		}
 	})
 
-	emailHTML, err := doc.Html()
+	modified, err = doc.Html()
 	if err != nil {
 		fmt.Println("Failed to convert document back to HTML:", err)
-		return "", err
+		return
 	}
 
-	return emailHTML, nil
+	return
 }

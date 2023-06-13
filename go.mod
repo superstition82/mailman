@@ -4,18 +4,19 @@ go 1.20
 
 require (
 	github.com/AfterShip/email-verifier v1.3.3
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/labstack/gommon v0.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
 	go.uber.org/zap v1.21.0
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	modernc.org/sqlite v1.23.0
 )
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
