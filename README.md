@@ -1,5 +1,3 @@
-# mailman 🗞
-
 ## API 
 
 ## email
